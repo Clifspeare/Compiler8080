@@ -1,7 +1,3 @@
-//
-// Created by spencer on 2/23/18.
-//
-
 #ifndef COMPILER8080_SCANNER_H
 #define COMPILER8080_SCANNER_H
 
@@ -9,16 +5,23 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <stack>
+#include <array>
 
-struct token {
-    TokenType type;
-    std::string* value;
+// Need to write fstream that reads in spaces and new lines in getNextToken.
+
+struct source_file {
+    std::ifstream* i_stream;
+    int index;
 };
 
 class Scanner {
 public:
     Scanner();
     Scanner(char* filename);
+
+    // Pushes new source file onto the stack.
+    void loadSourceFile(char* filename);
 
     token getNextToken();
 private:
@@ -28,7 +31,10 @@ private:
     std::vector<std::string> m_literals;
     std::vector<std::string> m_constants;
     std::vector<std::string> m_identifiers;
-    std::ifstream m_input;
+    std::vector<std::string> m_reserved;
+
+    std::ifstream* m_current_file;
+    std::stack<source_file> m_source_files;
 };
 
 
