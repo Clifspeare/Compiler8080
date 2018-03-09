@@ -11,6 +11,7 @@ enum class TokenType
     PREPROCESSOR_SYMBOL,
     DEFINE,
     INCLUDE,
+    LF,
     WS,
     INT,
     FLOAT,
