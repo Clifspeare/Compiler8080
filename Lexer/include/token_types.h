@@ -8,23 +8,30 @@
 
 enum class TokenType
 {
-    PREPROCESSOR_SYMBOL,
-    DEFINE,
-    INCLUDE,
-    LF,
-    WS,
-    INT,
-    FLOAT,
-    DOUBLE,
     ID,
     CONSTANT,
     LITERAL,
-    LESS_THAN
+    // preprocessors
+    PREPROCESSOR_SYMBOL,
+    DEFINE,
+    INCLUDE,
+
+    // special
+    LF,
+    WS,
+    LESS_THAN,
+
+    // reserved words
+    INT,
+    FLOAT,
+    DOUBLE,
+
+    UNDEFINED
 };
 
 struct Token {
     TokenType type;
-    std::string* value;
+    std::string value;
 };
 
 #endif //COMPILER8080_TOKEN_TYPES_H

@@ -11,7 +11,7 @@ Token Preprocessor::getNextToken() {
         // Iterate through def table and replace value if found.
         if (token.type == TokenType::ID) {
             for (const Definition def : m_defines) {
-                if (*def.token.value == *token.value) {
+                if (def.token.value == token.value) {
                     token.value = def.token.value;
                     token.type = def.token.type;
                     return token;
@@ -37,7 +37,7 @@ void Preprocessor::addDefinition(Token definition, Token value) {
     //also check TokenType of value
     assert(definition.type == TokenType::ID);
 
-    Definition def = {*definition.value, value};
+    Definition def = {definition.value, value};
     m_defines.push_back(def);
 }
 

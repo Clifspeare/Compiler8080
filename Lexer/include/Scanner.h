@@ -24,6 +24,7 @@ public:
     void loadSourceFile(char* filename);
 
     Token getNextToken();
+    Token buildToken();
 private:
     // implementation of token creation (from file) with state transitions, etc.
 
