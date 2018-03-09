@@ -21,7 +21,7 @@ enum class TokenType
     LESS_THAN
 };
 
-struct token {
+struct Token {
     TokenType type;
     std::string* value;
 };

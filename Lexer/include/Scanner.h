@@ -23,11 +23,11 @@ public:
     // Pushes new source file onto the stack.
     void loadSourceFile(char* filename);
 
-    token getNextToken();
+    Token getNextToken();
 private:
     // implementation of token creation (from file) with state transitions, etc.
 
-    std::vector<token> m_tokens;
+    std::vector<Token> m_tokens;
     std::vector<std::string> m_literals;
     std::vector<std::string> m_constants;
     std::vector<std::string> m_identifiers;
