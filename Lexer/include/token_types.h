@@ -22,9 +22,17 @@ enum class TokenType
     LESS_THAN,
 
     // reserved words
+    //native types
     INT,
     FLOAT,
     DOUBLE,
+    BOOL,
+    CHAR,
+    //keywords
+    IF,
+    ELSE,
+    STRUCT,
+    RETURN,
 
     UNDEFINED
 };

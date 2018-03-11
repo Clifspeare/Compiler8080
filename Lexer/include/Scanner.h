@@ -7,6 +7,7 @@
 #include <fstream>
 #include <stack>
 #include <array>
+#include <map>
 
 // Need to write fstream that reads in spaces and new lines in getNextToken.
 
@@ -27,12 +28,14 @@ public:
     Token buildToken();
 private:
     // implementation of token creation (from file) with state transitions, etc.
+    void populateReservedWordMap();
+    bool checkReservedWord(Token& token);
 
     std::vector<Token> m_tokens;
     std::vector<std::string> m_literals;
     std::vector<std::string> m_constants;
     std::vector<std::string> m_identifiers;
-    std::vector<std::string> m_reserved;
+    std::map<std::string, TokenType> m_reserved;
 
     std::ifstream* m_current_file;
     std::stack<source_file> m_source_files;
