@@ -1,7 +1,3 @@
-//
-// Created by zzaz3 on 3/4/2018.
-//
-
 #include <stdio.h>
 #define MAX 3
 int addition(int num1, int num2)

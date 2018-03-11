@@ -5,15 +5,12 @@
 #ifndef COMPILER8080_PREPROCESSOR_H
 #define COMPILER8080_PREPROCESSOR_H
 #include "Scanner.h"
-#include "token_types.h"
 #include <algorithm>
 
 struct Definition {
     std::string definition;
     Token token;
 };
-
-
 
 class Preprocessor {
 public:

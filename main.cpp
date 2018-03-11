@@ -1,6 +1,9 @@
+#include "Scanner.h"
+
 #include <iostream>
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Scanner lexer("hello_world.c");
+    while ()
     return 0;
 }

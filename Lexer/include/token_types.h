@@ -5,12 +5,14 @@
 #ifndef COMPILER8080_TOKEN_TYPES_H
 #define COMPILER8080_TOKEN_TYPES_H
 #include <string>
+#include <map>
 
 enum class TokenType
 {
     ID,
     CONSTANT,
     LITERAL,
+
     // preprocessors
     PREPROCESSOR_SYMBOL,
     DEFINE,
@@ -20,6 +22,7 @@ enum class TokenType
     LF,
     WS,
     LESS_THAN,
+    GREATER_THAN,
 
     // reserved words
     //native types
@@ -28,11 +31,34 @@ enum class TokenType
     DOUBLE,
     BOOL,
     CHAR,
+    SHORT,
+    LONG,
+    VOID,
     //keywords
     IF,
     ELSE,
+    WHILE,
+    FOR,
+    DO,
+    SWITCH,
+    CASE,
+    CONTINUE,
+    BREAK,
     STRUCT,
     RETURN,
+    VOLATILE,
+    ENUM,
+    EXTERN,
+    STATIC,
+    CONST,
+    AUTO,
+    TYPEDEF,
+    DEFAULT,
+    REGISTER,
+    UNION,
+    SIGNED,
+    UNSIGNED,
+    GOTO,
 
     UNDEFINED
 };
