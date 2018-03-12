@@ -90,22 +90,22 @@ bool Scanner::checkSetSymbol(const Token& token)
 char Scanner::getNextChar()
 {
     m_current_file->index++;
-    return m_current_file->buffer.get();
+    return m_current_file->buffer->get();
 }
 
 void Scanner::unGetChar(char character)
 {
     m_current_file->index--;
-    m_current_file->buffer.putback(character);
+    m_current_file->buffer->putback(character);
 }
 
 Token Scanner::getNextToken()
 {
 
     Token token;
-    token.value = getNextChar();
+    token.value += getNextChar();
     if (token.value[0] == -1)
-    token.type = TokenType::UNDEFINED;
+      token.type = TokenType::UNDEFINED;
     char c;
 
     // WHITESPACE TOKEN TYPE
@@ -162,13 +162,14 @@ Token Scanner::getNextToken()
     return token;
 }
 
-Scanner::Scanner() : m_current_file() {
+Scanner::Scanner() {
     populateReservedWordMap(m_reservedWords);
 }
 
-Scanner::Scanner(char* filepath) : m_current_file() {
+//TODO delete allocated ifstream when source_files are removed from stack
+Scanner::Scanner(char* filepath) {
     source_file currentFile;
-    currentFile.buffer = std::ifstream(filepath);
+    currentFile.buffer = new std::ifstream(filepath);
     m_source_files.push(currentFile);
     m_current_file = &m_source_files.top();
     populateReservedWordMap(m_reservedWords);
