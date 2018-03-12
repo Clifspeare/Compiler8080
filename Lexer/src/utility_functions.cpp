@@ -98,6 +98,7 @@ bool isWhiteSpace(const char& c)
     if (c == '\t' || c == ' ') {
         return true;
     }
+    return false;
 }
 
 void logTokenCreation(const Token& token) {
