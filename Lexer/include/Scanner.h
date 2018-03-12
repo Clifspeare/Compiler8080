@@ -14,7 +14,7 @@
 // Need to write fstream that reads in spaces and new lines in getNextToken.
 
 struct source_file {
-    std::ifstream buffer;
+    std::ifstream* buffer;
     int index = 0;
 };
 
@@ -32,7 +32,7 @@ public:
 private:
     // implementation of token creation (from file) with state transitions, etc.
     bool checkSetReservedWord(Token& token);
-    bool checkSetSymbol(Token& token);
+    bool checkSetSymbol(const Token& token);
 
     char getNextChar();
     void unGetChar(char Character);
