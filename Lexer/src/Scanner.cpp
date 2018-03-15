@@ -223,10 +223,7 @@ Token Scanner::getNextToken()
         }
         if (token.value.length() == 1) // only unget c if it was part of the symbol ( so part of next token)
             unGetChar(c);
-//        if (isSymbol(c = getNextChar())) {
-//            token.value += c;
-//            getNextChar();
-//        }
+        
         // set TokenType based on value
         checkSetSymbol(token);
     }
