@@ -70,6 +70,7 @@ Token Scanner::getNextToken()
     Token token;
     token.value += getNextChar();
     char c;
+    bool extraCharNeedsPutback = true;
 
     // WHITESPACE TOKEN TYPE
     if (isWhiteSpace(token.value[0])) {
@@ -82,7 +83,7 @@ Token Scanner::getNextToken()
     // newline char
     else if (token.value[0] == '\n') {
         token.type = TokenType::LF;
-        c = getNextChar();
+        extraCharNeedsPutback = false;
     }
 
     // RESERVED WORD / IDENTIFIER TOKEN TYPE
@@ -115,7 +116,7 @@ Token Scanner::getNextToken()
         }
         if (c == '"') {
             token.value += c;
-            c = getNextChar();
+            extraCharNeedsPutback = false;
         }
         else if (c == '\n')
             std::cerr << "Fatal Lexical Error: String literals cannot contain '\\n'" << std::endl;
@@ -208,11 +209,12 @@ Token Scanner::getNextToken()
     // preprocessor symbol
     else if (token.value[0] == '#') {
         token.type = TokenType::PREPROCESSOR_SYMBOL;
-        c = getNextChar();
+        extraCharNeedsPutback = false;
     }
 
     logTokenCreation(token);
-    unGetChar(c);
+    if (extraCharNeedsPutback)
+        unGetChar(c);
 
     return token;
 }
