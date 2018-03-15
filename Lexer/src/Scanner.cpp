@@ -130,7 +130,7 @@ Token Scanner::getNextToken()
         while ( isdigit((c = getNextChar())) || (c == '.' && !decimalSeen) ) {
             //TODO implement numeric constant logic
             if(c == '.'){
-                decimalSeen==true;
+                decimalSeen = true;
             }
             token.value += c;
         }
@@ -144,10 +144,90 @@ Token Scanner::getNextToken()
     }
     // SYMBOLS / SPECIAL TOKEN TYPE
     else if(isSymbol(token.value[0])) {
-        if (isSymbol(c = getNextChar())) {
-            token.value += c;
-            getNextChar();
+        c = getNextChar(); // get next char before handling, can push back later
+        switch (token.value[0]) { //handle cases where symbol may consist of > 1 character
+            case '-':
+                if (c == '>') // pointer member referencing operator
+                    token.value += c;
+                if (c == '-') // decrement op
+                    token.value += c;
+                if (c == '=') // subtract assign
+                    token.value += c;
+            case '+':
+                if (c == '+') // increment op
+                    token.value += c;
+                if (c == '=') // add assign
+                    token.value += c;
+            case '!':
+                if (c == '=') // inequality
+                    token.value += c;
+            case '/':
+                if (c == '=') // divide assign
+                    token.value += c;
+            case '*':
+                if (c == '=') // multiply assign
+                    token.value += c;
+            case '%':
+                if (c == '=') // mod assign
+                    token.value += c;
+            case '<':
+                if (c == '<') { // this is one a few special characters that may be in symbols of 3 characters in size
+                    token.value += c;
+                    if ((c = getNextChar()) == '=') // bit shift left assign
+                        token.value += c;
+                    else // just bit shift left
+                        unGetChar(c); // final check for ungetting c won't work for this 3-character symbol case
+                }
+                if (c == '=') // less-than bool assign
+                    token.value += c;
+
+            case '>':
+                if (c == '>') { // bit shift right
+                    token.value += c;
+                    if ((c = getNextChar()) == '=') // as above
+                        token.value += c;
+                    else
+                        unGetChar(c);
+                }
+                if (c == '=') // greater-than bool assign
+                    token.value += c;
+            case '=':
+                if (c == '=') //equality
+                    token.value += c;
+            case '&':
+                if (c == '&') // logic AND
+                    token.value += c;
+                if (c == '=') // bit AND assign
+                    token.value += c;
+            case '|':
+                if (c == '|') // logic OR
+                    token.value += c;
+                if (c == '=') // bit NOT assign
+                    token.value += c;
+            // apparently ternary (? :) counts as a single operator in c.  how to handle THAT, i have NO IDEA.
+            // leaving for now (later thoughts... maybe just walk ahead at instance of ? until we find ':')?
+            // still not sure how we should represent.
+            case '^':
+                if (c == '=') // XOR assign
+                    token.value += c;
+            case '#':
+                if (c == '#') // some preprocessor mumbo-jumbo
+                    token.value += c;
+            case '.':
+                char third_char = getNextChar();
+                if (c == '.' && third_char == '.') { // elipsis
+                    token.value += c + third_char;
+                } else {
+                    unGetChar(third_char); // unget extra/unhandled 3rd char
+                }
         }
+        if (token.value.length() == 1) // only unget c if it was part of the symbol ( so part of next token)
+            unGetChar(c);
+//        if (isSymbol(c = getNextChar())) {
+//            token.value += c;
+//            getNextChar();
+//        }
+        // set TokenType based on value
         checkSetSymbol(token);
     }
 
