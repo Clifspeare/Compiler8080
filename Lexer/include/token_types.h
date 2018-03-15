@@ -21,8 +21,53 @@ enum class TokenType
     // special
     LF,
     WS,
+    OPEN_BRACE,
+    CLOSE_BRACE,
+    OPEN_BRACKET,
+    CLOSE_BRACKET,
+    OPEN_PARENS,
+    CLOSE_PARENS,
+    DOT,
+    SELECTION,
+    PLUS_PLUS,
+    MINUS_MINUS,
+    AND,
+    STAR,
+    PLUS,
+    MINUS,
+    TILDE,
+    NOT,
+    SLASH,
+    PERCENT,
+    LESS_LESS,
+    GREATER_GREATER,
     LESS_THAN,
     GREATER_THAN,
+    LESS_EQUAL,
+    GREATER_EQUAL,
+    EQUAL_EQUAL,
+    NOT_EQUAL,
+    XOR,
+    OR,
+    AND_AND,
+    OR_OR,
+    EQUAL,
+    STAR_EQUAL,
+    SLASH_EQUAL,
+    PERCENT_EQUAL,
+    PLUS_EQUAL,
+    MINUS_EQUAL,
+    LESS_LESS_EQUAL,
+    GREATER_GREATER_EQUAL,
+    AND_EQUAL,
+    XOR_EQUAL,
+    OR_EQUAL,
+    COMMA,
+    HASH,
+    HASH_HASH,
+    SEMICOLON,
+    COLON,
+    ELLIPSIS,
 
     // reserved words
     //native types
@@ -64,7 +109,7 @@ enum class TokenType
 };
 
 struct Token {
-    TokenType type;
+    TokenType type = TokenType::UNDEFINED;
     std::string value;
 };
 

@@ -52,41 +52,6 @@ bool Scanner::checkSetReservedWord(Token& token)
     return false;
 }
 
-bool Scanner::checkSetSymbol(const Token& token)
-{
-    // TODO: Make this work.
-//    if (token.value == '!')
-//        token.type = TokenType::
-//            c == '{' ||
-//            c == '}' ||
-//            c == '(' ||
-//            c == ')' ||
-//            c == '[' ||
-//            c == ']' ||
-//            c == '+' ||
-//            c == '-' ||
-//            c == '%' ||
-//            c == '/' ||
-//            c == '*' ||
-//            c == '&' ||
-//            c == '<' ||
-//            c == '>' ||
-//            c == '=' ||
-//            c == '^' ||
-//            c == '|' ||
-//            c == '~' ||
-//            c == ';' ||
-//            c == ',' ||
-//            c == '.' ||
-//            c == ':' ||
-//            c == '?'
-//            )
-//    {
-//        return true;
-//    }
-    return false;
-};
-
 char Scanner::getNextChar()
 {
     m_current_file->index++;
@@ -104,8 +69,6 @@ Token Scanner::getNextToken()
 
     Token token;
     token.value += getNextChar();
-    if (token.value[0] == -1)
-      token.type = TokenType::UNDEFINED;
     char c;
 
     // WHITESPACE TOKEN TYPE
@@ -115,6 +78,13 @@ Token Scanner::getNextToken()
             token.value += c;
         }
     }
+
+    // newline char
+    else if (token.value[0] == '\n') {
+        token.type = TokenType::LF;
+        c = getNextChar();
+    }
+
     // RESERVED WORD / IDENTIFIER TOKEN TYPE
     else if (token.value[0] == '_' || isalpha(token.value[0])) {
         token.type = TokenType::ID;
@@ -123,6 +93,7 @@ Token Scanner::getNextToken()
         }
         checkSetReservedWord(token);
     }
+
     // NUMBER/CONSTANT TOKEN TYPE
     else if (isdigit(token.value[0]) || c == '.') {
         bool decimalSeen = false;
@@ -135,13 +106,21 @@ Token Scanner::getNextToken()
             token.value += c;
         }
     }
+
     // STRING TOKEN TYPE
     else if (token.value[0] == '"') {
         token.type = TokenType::LITERAL;
         while ((c = getNextChar()) != '"' && c != '\n') {
             token.value += c;
         }
+        if (c == '"') {
+            token.value += c;
+            c = getNextChar();
+        }
+        else if (c == '\n')
+            std::cerr << "Fatal Lexical Error: String literals cannot contain '\\n'" << std::endl;
     }
+
     // SYMBOLS / SPECIAL TOKEN TYPE
     else if(isSymbol(token.value[0])) {
         c = getNextChar(); // get next char before handling, can push back later
@@ -204,9 +183,7 @@ Token Scanner::getNextToken()
                     token.value += c;
                 if (c == '=') // bit NOT assign
                     token.value += c;
-            // apparently ternary (? :) counts as a single operator in c.  how to handle THAT, i have NO IDEA.
-            // leaving for now (later thoughts... maybe just walk ahead at instance of ? until we find ':')?
-            // still not sure how we should represent.
+                // does ternary belong here?
             case '^':
                 if (c == '=') // XOR assign
                     token.value += c;
@@ -221,16 +198,17 @@ Token Scanner::getNextToken()
                     unGetChar(third_char); // unget extra/unhandled 3rd char
                 }
         }
-        if (token.value.length() == 1) // only unget c if it was part of the symbol ( so part of next token)
-            unGetChar(c);
-        
+        //if (token.value.length() == 1) // only unget c if it was part of the symbol ( so part of next token)
+            //unGetChar(c);
+
         // set TokenType based on value
         checkSetSymbol(token);
     }
 
+    // preprocessor symbol
     else if (token.value[0] == '#') {
         token.type = TokenType::PREPROCESSOR_SYMBOL;
-        getNextChar();
+        c = getNextChar();
     }
 
     logTokenCreation(token);

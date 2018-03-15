@@ -10,7 +10,7 @@ int main() {
     Token token;
     int counter = 0;
     while ((token = lexer.getNextToken()).type != TokenType::UNDEFINED) {
-        std::cout << "Token" << counter++ << " " << getEnumString(token.type) << std::endl;
+        // std::cout << "Token" << counter++ << " " << getEnumString(token.type) << std::endl; Already logged.
     }
     return 0;
 }
