@@ -32,7 +32,6 @@ public:
 private:
     // implementation of token creation (from file) with state transitions, etc.
     bool checkSetReservedWord(Token& token);
-    bool checkSetSymbol(const Token& token);
 
     char getNextChar();
     void unGetChar(char Character);

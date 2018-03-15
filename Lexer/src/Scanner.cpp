@@ -52,41 +52,6 @@ bool Scanner::checkSetReservedWord(Token& token)
     return false;
 }
 
-bool Scanner::checkSetSymbol(const Token& token)
-{
-    // TODO: Make this work.
-//    if (token.value == '!')
-//        token.type = TokenType::
-//            c == '{' ||
-//            c == '}' ||
-//            c == '(' ||
-//            c == ')' ||
-//            c == '[' ||
-//            c == ']' ||
-//            c == '+' ||
-//            c == '-' ||
-//            c == '%' ||
-//            c == '/' ||
-//            c == '*' ||
-//            c == '&' ||
-//            c == '<' ||
-//            c == '>' ||
-//            c == '=' ||
-//            c == '^' ||
-//            c == '|' ||
-//            c == '~' ||
-//            c == ';' ||
-//            c == ',' ||
-//            c == '.' ||
-//            c == ':' ||
-//            c == '?'
-//            )
-//    {
-//        return true;
-//    }
-    return false;
-};
-
 char Scanner::getNextChar()
 {
     m_current_file->index++;
@@ -104,9 +69,8 @@ Token Scanner::getNextToken()
 
     Token token;
     token.value += getNextChar();
-    if (token.value[0] == -1)
-      token.type = TokenType::UNDEFINED;
     char c;
+    bool extraCharNeedsPutback = true;
 
     // WHITESPACE TOKEN TYPE
     if (isWhiteSpace(token.value[0])) {
@@ -115,6 +79,13 @@ Token Scanner::getNextToken()
             token.value += c;
         }
     }
+
+    // newline char
+    else if (token.value[0] == '\n') {
+        token.type = TokenType::LF;
+        extraCharNeedsPutback = false;
+    }
+
     // RESERVED WORD / IDENTIFIER TOKEN TYPE
     else if (token.value[0] == '_' || isalpha(token.value[0])) {
         token.type = TokenType::ID;
@@ -123,6 +94,7 @@ Token Scanner::getNextToken()
         }
         checkSetReservedWord(token);
     }
+
     // NUMBER/CONSTANT TOKEN TYPE
     else if (isdigit(token.value[0]) || c == '.') {
         bool decimalSeen = false;
@@ -130,34 +102,119 @@ Token Scanner::getNextToken()
         while ( isdigit((c = getNextChar())) || (c == '.' && !decimalSeen) ) {
             //TODO implement numeric constant logic
             if(c == '.'){
-                decimalSeen==true;
+                decimalSeen = true;
             }
             token.value += c;
         }
     }
+
     // STRING TOKEN TYPE
     else if (token.value[0] == '"') {
         token.type = TokenType::LITERAL;
         while ((c = getNextChar()) != '"' && c != '\n') {
             token.value += c;
         }
+        if (c == '"') {
+            token.value += c;
+            extraCharNeedsPutback = false;
+        }
+        else if (c == '\n')
+            std::cerr << "Fatal Lexical Error: String literals cannot contain '\\n'" << std::endl;
     }
+
     // SYMBOLS / SPECIAL TOKEN TYPE
     else if(isSymbol(token.value[0])) {
-        if (isSymbol(c = getNextChar())) {
-            token.value += c;
-            getNextChar();
+        c = getNextChar(); // get next char before handling, can push back later
+        switch (token.value[0]) { //handle cases where symbol may consist of > 1 character
+            case '-':
+                if (c == '>') // pointer member referencing operator
+                    token.value += c;
+                if (c == '-') // decrement op
+                    token.value += c;
+                if (c == '=') // subtract assign
+                    token.value += c;
+            case '+':
+                if (c == '+') // increment op
+                    token.value += c;
+                if (c == '=') // add assign
+                    token.value += c;
+            case '!':
+                if (c == '=') // inequality
+                    token.value += c;
+            case '/':
+                if (c == '=') // divide assign
+                    token.value += c;
+            case '*':
+                if (c == '=') // multiply assign
+                    token.value += c;
+            case '%':
+                if (c == '=') // mod assign
+                    token.value += c;
+            case '<':
+                if (c == '<') { // this is one a few special characters that may be in symbols of 3 characters in size
+                    token.value += c;
+                    if ((c = getNextChar()) == '=') // bit shift left assign
+                        token.value += c;
+                    else // just bit shift left
+                        unGetChar(c); // final check for ungetting c won't work for this 3-character symbol case
+                }
+                if (c == '=') // less-than bool assign
+                    token.value += c;
+
+            case '>':
+                if (c == '>') { // bit shift right
+                    token.value += c;
+                    if ((c = getNextChar()) == '=') // as above
+                        token.value += c;
+                    else
+                        unGetChar(c);
+                }
+                if (c == '=') // greater-than bool assign
+                    token.value += c;
+            case '=':
+                if (c == '=') //equality
+                    token.value += c;
+            case '&':
+                if (c == '&') // logic AND
+                    token.value += c;
+                if (c == '=') // bit AND assign
+                    token.value += c;
+            case '|':
+                if (c == '|') // logic OR
+                    token.value += c;
+                if (c == '=') // bit NOT assign
+                    token.value += c;
+                // does ternary belong here?
+            case '^':
+                if (c == '=') // XOR assign
+                    token.value += c;
+            case '#':
+                if (c == '#') // some preprocessor mumbo-jumbo
+                    token.value += c;
+            case '.':
+                char third_char = getNextChar();
+                if (c == '.' && third_char == '.') { // elipsis
+                    token.value += c + third_char;
+                } else {
+                    unGetChar(third_char); // unget extra/unhandled 3rd char
+                }
         }
+        //if (token.value.length() == 1) // only unget c if it was part of the symbol ( so part of next token)
+            //unGetChar(c);
+
+        // set TokenType based on value
         checkSetSymbol(token);
     }
 
+    // preprocessor symbol
     else if (token.value[0] == '#') {
         token.type = TokenType::PREPROCESSOR_SYMBOL;
-        getNextChar();
+        extraCharNeedsPutback = false;
     }
 
     logTokenCreation(token);
-    unGetChar(c);
+    if (extraCharNeedsPutback)
+        unGetChar(c);
 
     return token;
 }
