@@ -105,11 +105,11 @@ enum class TokenType
     UNSIGNED,
     GOTO,
 
-    UNDEFINED
+    UNKNOWN
 };
 
 struct Token {
-    TokenType type = TokenType::UNDEFINED;
+    TokenType type = TokenType::UNKNOWN;
     std::string value;
 };
 

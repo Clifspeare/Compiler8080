@@ -15,6 +15,7 @@ struct Definition {
 class Preprocessor {
 public:
     Preprocessor();
+    Preprocessor(char* filepath);
 
     Token getNextToken();
 private:

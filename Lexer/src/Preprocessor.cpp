@@ -7,28 +7,33 @@
 
 Token Preprocessor::getNextToken() {
     Token token = m_scanner.getNextToken();
-    if (token.type != TokenType::PREPROCESSOR_SYMBOL) {
-        // Iterate through def table and replace value if found.
-        if (token.type == TokenType::ID) {
-            for (const Definition def : m_defines) {
-                if (def.token.value == token.value) {
-                    token.value = def.token.value;
-                    token.type = def.token.type;
-                    return token;
+    if (token.type == TokenType::UNKNOWN) {
+        m_scanner.popSourceFile();
+    }
+    if (token.type != TokenType::HASH) {
+        return token;
+    } else {
+        if ((token = m_scanner.getNextToken()).type == TokenType::ID) {
+
+            // handle defines and includes
+            if (token.value == "include") {
+                token = m_scanner.getNextToken();
+                if (token.type != TokenType::WS)
+                    std::cout << "ERROR" << std::endl;
+                token = m_scanner.getNextToken();
+                if (token.type == TokenType::LITERAL) {
+                    m_scanner.loadSourceFile(token.value.c_str());
+                } else if (token.type == TokenType::LESS_THAN) {
+                    std::string filename;
+                    std::string dot;
+                    std::string ext;
+                } else {
+                    std::cout << "ERROR" << std::endl;
                 }
+                return m_scanner.getNextToken();
             }
         }
-        // Else.
         return token;
-    }
-
-    token = m_scanner.getNextToken();
-    if (token.type == TokenType::DEFINE) {
-        addDefinition(m_scanner.getNextToken(), m_scanner.getNextToken());
-    } else if (token.type == TokenType::INCLUDE) {
-        //TODO: push new source file onto Scanner and get all tokens from that
-    } else { // nothing for now
-
     }
 }
 
@@ -39,5 +44,8 @@ void Preprocessor::addDefinition(Token definition, Token value) {
 
     Definition def = {definition.value, value};
     m_defines.push_back(def);
+}
+
+Preprocessor::Preprocessor(char *filepath) : m_scanner(filepath) {
 }
 

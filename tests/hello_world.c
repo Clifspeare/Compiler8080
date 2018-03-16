@@ -1,5 +1,7 @@
+#include "hello_stuff.h"
+
 int main()
 {
-    printf("Hello World!");
+    printf("%i",doStuff());
     return 0;
 }

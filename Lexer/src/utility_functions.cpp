@@ -97,7 +97,7 @@ std::string getEnumString(TokenType enumval)
         case TokenType::COLON:                  return ":";
         case TokenType::ELLIPSIS:               return "...";
 
-        case TokenType::UNDEFINED:              return "UNDEFINED TOKEN";
+        case TokenType::UNKNOWN:              return "UNKNOWN TOKEN";
 
         default: return "token not added in getEnumString";
     }
@@ -238,13 +238,16 @@ bool checkSetSymbol(Token& token)
     else if (token.value == "...")
         token.type = TokenType::ELLIPSIS;
 
-    if (token.type == TokenType::UNDEFINED)
+    if (token.type == TokenType::UNKNOWN)
         return false;
     return false;
 };
 
-void logTokenCreation(const Token& token) {
-    assert(token.type != TokenType::UNDEFINED);
+void logTokenCreation(const Token& token, const int& depth) {
+    //assert(token.type != TokenType::UNKNOWN);
+    for(int i = 0; i < depth; i++){
+        std::cout << " ";
+    }
     std::cout << getPrintableTokenValue(token) << " add as " << getEnumString(token.type) << std::endl;
 }
 

@@ -25,22 +25,26 @@ public:
     Scanner(char* filename);
 
     // Pushes new source file onto the stack.
-    void loadSourceFile(char* filepath);
+    void loadSourceFile(const char* filepath);
+
+    void popSourceFile();
 
     Token getNextToken();
-    Token buildToken();
 private:
     // implementation of token creation (from file) with state transitions, etc.
     bool checkSetReservedWord(Token& token);
 
     char getNextChar();
     void unGetChar(char Character);
+    int depth = 0; // Count of how many files are open.
+    bool end = false;
 
     std::vector<Token> m_tokens;
     std::vector<std::string> m_literals;
     std::vector<std::string> m_constants;
     std::vector<std::string> m_identifiers;
     std::map<std::string, TokenType> m_reservedWords;
+
 
     source_file *m_current_file;
     std::stack<source_file> m_source_files;

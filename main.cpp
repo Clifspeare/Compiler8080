@@ -1,4 +1,4 @@
-#include "Scanner.h"
+#include "Preprocessor.h"
 #include "token_types.h"
 #include "utility_functions.h"
 
@@ -6,11 +6,13 @@
 
 int main() {
     char filepath[]="hello_world.c";
-    Scanner lexer(filepath);
+    Preprocessor lexer(filepath);
     Token token;
     int counter = 0;
-    while ((token = lexer.getNextToken()).type != TokenType::UNDEFINED) {
-        // std::cout << "Token" << counter++ << " " << getEnumString(token.type) << std::endl; Already logged.
+    while ((token = lexer.getNextToken()).value != "eof") {
+        if(token.value == "end")
+            break;
     }
+    std::cout << "end reached";
     return 0;
 }

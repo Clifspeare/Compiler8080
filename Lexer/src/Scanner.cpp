@@ -52,6 +52,22 @@ bool Scanner::checkSetReservedWord(Token& token)
     return false;
 }
 
+void Scanner::loadSourceFile(const char* filepath){
+    source_file n_source;
+    n_source.buffer = new std::ifstream(filepath);
+    n_source.index = 0;
+    depth++;
+    m_source_files.push(n_source);
+    m_current_file = &m_source_files.top();
+}
+
+void Scanner::popSourceFile()
+{
+    m_source_files.pop();
+    m_current_file = &m_source_files.top();
+    depth--;
+}
+
 char Scanner::getNextChar()
 {
     m_current_file->index++;
@@ -66,7 +82,21 @@ void Scanner::unGetChar(char character)
 
 Token Scanner::getNextToken()
 {
-
+    if(m_current_file->buffer->eof()){
+        m_source_files.pop();
+        depth--;
+        if(m_source_files.empty()) {
+            Token token;
+            token.value = "end";
+            end = true;
+            return token;
+        }
+        else {
+            Token token;
+            token.value = "eof";
+            return token;
+        }
+    }
     Token token;
     token.value += getNextChar();
     char c;
@@ -110,12 +140,13 @@ Token Scanner::getNextToken()
 
     // STRING TOKEN TYPE
     else if (token.value[0] == '"') {
+
         token.type = TokenType::LITERAL;
+        token.value.pop_back();
         while ((c = getNextChar()) != '"' && c != '\n') {
             token.value += c;
         }
         if (c == '"') {
-            token.value += c;
             extraCharNeedsPutback = false;
         }
         else if (c == '\n')
@@ -212,7 +243,7 @@ Token Scanner::getNextToken()
         extraCharNeedsPutback = false;
     }
 
-    logTokenCreation(token);
+    logTokenCreation(token,depth);
     if (extraCharNeedsPutback)
         unGetChar(c);
 

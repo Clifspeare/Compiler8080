@@ -17,7 +17,9 @@ bool isWhiteSpace(const char& c);
 bool checkSetSymbol(Token& token);
 
 // Error handling.
-void logTokenCreation(const Token& token);
+void logTokenCreation(const Token& token, const int& depth);
+void logError(const std::string& error);
+
 std::string getPrintableTokenValue(const Token token);
 
 #endif //COMPILER8080_UTILITY_FUNCTIONS_H
