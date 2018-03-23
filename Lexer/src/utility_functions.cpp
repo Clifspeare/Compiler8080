@@ -259,6 +259,8 @@ std::string getPrintableTokenValue(const Token token)
         return "\\t";
     else if (token.type == TokenType::WS)
         return "' '";
+    else if (token.value.at(0) == EOF)
+        return "EOF";
     else
         return token.value;
 }
