@@ -9,10 +9,8 @@ int main() {
     Preprocessor lexer(filepath);
     Token token;
     int counter = 0;
-    while ((token = lexer.getNextToken()).value != "eof") {
-        if(token.value == "end")
-            break;
+    while ((token = lexer.getNextToken()).value.at(0) != EOF) {
     }
-    std::cout << "end reached";
+    std::cout << "end reached" << std::endl;
     return 0;
 }
