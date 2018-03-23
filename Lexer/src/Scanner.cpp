@@ -85,7 +85,7 @@ Token Scanner::getNextToken()
     if(m_current_file->buffer->eof()){
         m_source_files.pop();
         depth--;
-        if(m_source_files.empty()) {
+        if(m_source_files.size() < 2) {
             Token token;
             token.value = "end";
             end = true;
