@@ -1,4 +1,6 @@
+#define RETVAL 5
+
 void doStuff()
 {
-    return 1;
+    return RETVAL;
 }

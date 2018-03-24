@@ -20,6 +20,8 @@ public:
     Token getNextToken();
 private:
     void addDefinition(Token definition, Token value);
+    bool hasDefinition(Token token);
+    Token getDefinitionReplacement(std::string idStringToBeReplaced);
 
     Scanner m_scanner;
 

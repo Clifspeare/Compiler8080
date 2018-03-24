@@ -82,10 +82,15 @@ void Scanner::unGetChar(char character)
 
 Token Scanner::getNextToken()
 {
-    if(m_current_file->buffer->eof()){
-        m_source_files.pop();
+    Token token;
+    token.value += getNextChar();
+    char c;
+    bool extraCharNeedsPutback = true;
+
+    if(token.value.at(0) == EOF){
+        popSourceFile();
         depth--;
-        if(m_source_files.size() < 2) {
+        if(m_source_files.empty()) {
             Token token;
             token.value = "end";
             end = true;
@@ -97,10 +102,6 @@ Token Scanner::getNextToken()
             return token;
         }
     }
-    Token token;
-    token.value += getNextChar();
-    char c;
-    bool extraCharNeedsPutback = true;
 
     // WHITESPACE TOKEN TYPE
     if (isWhiteSpace(token.value[0])) {
@@ -247,6 +248,9 @@ Token Scanner::getNextToken()
     if (extraCharNeedsPutback)
         unGetChar(c);
 
+    if (token.type == TokenType::WS) {
+        return getNextToken();
+    }
     return token;
 }
 
