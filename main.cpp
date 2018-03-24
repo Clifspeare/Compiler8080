@@ -10,6 +10,7 @@ int main() {
     Token token;
     int counter = 0;
     while ((token = lexer.getNextToken()).value != "end") {
+    //    std::cout << token.value << std::endl;
     }
     std::cout << "end reached" << std::endl;
     return 0;

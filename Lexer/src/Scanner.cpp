@@ -4,44 +4,6 @@
 
 #include "../include/Scanner.h"
 
-void populateReservedWordMap(std::map<std::string, TokenType> &reservedWordMap)
-{
-        reservedWordMap = {
-                std::make_pair("int", TokenType::INT),
-                std::make_pair("double", TokenType::DOUBLE),
-                std::make_pair("float", TokenType::FLOAT),
-                std::make_pair("short", TokenType::SHORT),
-                std::make_pair("long", TokenType::LONG),
-                std::make_pair("char", TokenType::CHAR),
-                std::make_pair("bool", TokenType::BOOL),
-                std::make_pair("void", TokenType::VOID),
-                std::make_pair("if", TokenType::IF),
-                std::make_pair("else", TokenType::ELSE),
-                std::make_pair("return", TokenType::RETURN),
-                std::make_pair("struct", TokenType::STRUCT),
-                std::make_pair("while", TokenType::WHILE),
-                std::make_pair("for", TokenType::FOR),
-                std::make_pair("volatile", TokenType::VOLATILE),
-                std::make_pair("enum", TokenType::ENUM),
-                std::make_pair("extern", TokenType::EXTERN),
-                std::make_pair("static", TokenType::STATIC),
-                std::make_pair("continue", TokenType::CONTINUE),
-                std::make_pair("const", TokenType::CONST),
-                std::make_pair("auto", TokenType::AUTO),
-                std::make_pair("typedef", TokenType::TYPEDEF),
-                std::make_pair("default", TokenType::DEFAULT),
-                std::make_pair("register", TokenType::REGISTER),
-                std::make_pair("switch", TokenType::SWITCH),
-                std::make_pair("case", TokenType::CASE),
-                std::make_pair("union", TokenType::UNION),
-                std::make_pair("signed", TokenType::SIGNED),
-                std::make_pair("unsigned", TokenType::UNSIGNED),
-                std::make_pair("do", TokenType::DO),
-                std::make_pair("break", TokenType::BREAK),
-                std::make_pair("goto", TokenType::GOTO)
-        };
-}
-
 bool Scanner::checkSetReservedWord(Token& token)
 {
     auto type = m_reservedWords.find(token.value);
@@ -87,24 +49,23 @@ Token Scanner::getNextToken()
     char c;
     bool extraCharNeedsPutback = true;
 
+    // handle end-of-file
     if(token.value.at(0) == EOF){
+        extraCharNeedsPutback = false;
         popSourceFile();
-        depth--;
         if(m_source_files.empty()) {
-            Token token;
             token.value = "end";
             end = true;
             return token;
         }
         else {
-            Token token;
             token.value = "eof";
             return token;
         }
     }
 
     // WHITESPACE TOKEN TYPE
-    if (isWhiteSpace(token.value[0])) {
+    else if (isWhiteSpace(token.value[0])) {
         token.type = TokenType::WS;
         while (isWhiteSpace(c = getNextChar())) {
             token.value += c;
@@ -231,8 +192,6 @@ Token Scanner::getNextToken()
                     unGetChar(third_char); // unget extra/unhandled 3rd char
                 }
         }
-        //if (token.value.length() == 1) // only unget c if it was part of the symbol ( so part of next token)
-            //unGetChar(c);
 
         // set TokenType based on value
         checkSetSymbol(token);
@@ -244,10 +203,13 @@ Token Scanner::getNextToken()
         extraCharNeedsPutback = false;
     }
 
-    logTokenCreation(token,depth);
-    if (extraCharNeedsPutback)
-        unGetChar(c);
 
+    if (logRawTokens) {
+        logTokenCreation(token,depth);
+    }
+    if (extraCharNeedsPutback) {
+        unGetChar(c);
+    }
     if (token.type == TokenType::WS) {
         return getNextToken();
     }
@@ -255,7 +217,6 @@ Token Scanner::getNextToken()
 }
 
 Scanner::Scanner() {
-    populateReservedWordMap(m_reservedWords);
 }
 
 //TODO delete allocated ifstream when source_files are removed from stack
@@ -264,5 +225,4 @@ Scanner::Scanner(char* filepath) {
     currentFile.buffer = new std::ifstream(filepath);
     m_source_files.push(currentFile);
     m_current_file = &m_source_files.top();
-    populateReservedWordMap(m_reservedWords);
 }
