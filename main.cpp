@@ -3,10 +3,18 @@
 #include "utility_functions.h"
 
 #include <iostream>
+#include <cstring>
 
-int main() {
+int main(int argc, char *argv[]) {
     char filepath[]="hello_world.c";
-    Scanner lexer(filepath);
+
+    bool doRawLog = false;
+    if (argc > 1) {
+        if (strcmp(argv[1], "-log") == 0) {
+            doRawLog = true;
+        }
+    }
+    Scanner lexer(filepath, doRawLog);
     Preprocessor preprocessor(lexer);
     Token token;
     int counter = 0;

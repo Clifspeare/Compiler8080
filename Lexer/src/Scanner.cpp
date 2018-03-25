@@ -217,7 +217,13 @@ Scanner::Scanner() {
 }
 
 //TODO delete allocated ifstream when source_files are removed from stack
-Scanner::Scanner(char* filepath) {
-    m_source_files.push(std::make_shared<std::ifstream>(filepath));
-    m_current_file = m_source_files.top();
+Scanner::Scanner(char* filepath)
+{
+    loadSourceFile(filepath);
+}
+
+Scanner::Scanner(char *filename, bool doRawTokenLogging)
+{
+    loadSourceFile(filename);
+    logRawTokens = doRawTokenLogging;
 }

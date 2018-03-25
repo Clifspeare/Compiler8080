@@ -16,6 +16,7 @@ class Scanner {
 public:
     Scanner();
     Scanner(char* filename);
+    Scanner(char* filename, bool doRawTokenLogging);
 
     // Push and pop functions manage state of the open source files.
     void loadSourceFile(const char* filepath);
