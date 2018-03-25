@@ -14,7 +14,7 @@ std::string getEnumString(TokenType enumval);
 
 bool isSymbol(const char& c);
 bool isWhiteSpace(const char& c);
-bool checkSetSymbol(Token& token);
+TokenType tokenSymbolFromValue(const std::string &token_value);
 
 // Error handling.
 void logTokenCreation(const Token& token, const int& depth);

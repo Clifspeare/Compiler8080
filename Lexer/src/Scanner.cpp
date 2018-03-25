@@ -194,7 +194,7 @@ Token Scanner::getNextToken()
         }
 
         // set TokenType based on value
-        checkSetSymbol(token);
+        token.type = tokenSymbolFromValue(token.value);
     }
 
     // preprocessor symbol

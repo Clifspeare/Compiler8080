@@ -141,106 +141,104 @@ bool isWhiteSpace(const char& c)
     return false;
 }
 
-bool checkSetSymbol(Token& token)
+TokenType tokenSymbolFromValue(const std::string &token_value)
 {
-    if (token.value == "{")
-        token.type = TokenType::OPEN_BRACE;
-    else if (token.value == "}")
-        token.type = TokenType::CLOSE_BRACE;
-    else if (token.value == "[")
-        token.type = TokenType::OPEN_BRACKET;
-    else if (token.value == "]")
-        token.type = TokenType::CLOSE_BRACKET;
-    else if (token.value == "(")
-        token.type = TokenType::OPEN_PARENS;
-    else if (token.value == ")")
-        token.type = TokenType::CLOSE_PARENS;
-    else if (token.value == ".")
-        token.type = TokenType::DOT;
-    else if (token.value == "->")
-        token.type = TokenType::SELECTION;
-    else if (token.value == "++")
-        token.type = TokenType::PLUS_PLUS;
-    else if (token.value == "--")
-        token.type = TokenType::MINUS_MINUS;
-    else if (token.value == "&")
-        token.type = TokenType::AND;
-    else if (token.value == "*")
-        token.type = TokenType::STAR;
-    else if (token.value == "+")
-        token.type = TokenType::PLUS;
-    else if (token.value == "-")
-        token.type = TokenType::MINUS;
-    else if (token.value == "~")
-        token.type = TokenType::TILDE;
-    else if (token.value == "!")
-        token.type = TokenType::NOT;
-    else if (token.value == "/")
-        token.type = TokenType::SLASH;
-    else if (token.value == "%")
-        token.type = TokenType::PERCENT;
-    else if (token.value == "<<")
-        token.type = TokenType::LESS_LESS;
-    else if (token.value == ">>")
-        token.type = TokenType::GREATER_GREATER;
-    else if (token.value == "<")
-        token.type = TokenType::LESS_THAN;
-    else if (token.value == ">")
-        token.type = TokenType::GREATER_THAN;
-    else if (token.value == "<=")
-        token.type = TokenType::LESS_EQUAL;
-    else if (token.value == ">=")
-        token.type = TokenType::GREATER_EQUAL;
-    else if (token.value == "==")
-        token.type = TokenType::EQUAL_EQUAL;
-    else if (token.value == "!=")
-        token.type = TokenType::NOT_EQUAL;
-    else if (token.value == "^")
-        token.type = TokenType::XOR;
-    else if (token.value == "|")
-        token.type = TokenType::OR;
-    else if (token.value == "&&")
-        token.type = TokenType::AND_AND;
-    else if (token.value == "||")
-        token.type = TokenType::OR_OR;
-    else if (token.value == "=")
-        token.type = TokenType::EQUAL;
-    else if (token.value == "*=")
-        token.type = TokenType::STAR_EQUAL;
-    else if (token.value == "/=")
-        token.type = TokenType::SLASH_EQUAL;
-    else if (token.value == "%=")
-        token.type = TokenType::PERCENT_EQUAL;
-    else if (token.value == "+=")
-        token.type = TokenType::PLUS_EQUAL;
-    else if (token.value == "-=")
-        token.type = TokenType::MINUS_EQUAL;
-    else if (token.value == "<<=")
-        token.type = TokenType::LESS_LESS_EQUAL;
-    else if (token.value == ">>=")
-        token.type = TokenType::GREATER_GREATER_EQUAL;
-    else if (token.value == "&=")
-        token.type = TokenType::AND_EQUAL;
-    else if (token.value == "^=")
-        token.type = TokenType::XOR_EQUAL;
-    else if (token.value == "|=")
-        token.type = TokenType::OR_EQUAL;
-    else if (token.value == ",")
-        token.type = TokenType::COMMA;
-    else if (token.value == "#")
-        token.type = TokenType::HASH;
-    else if (token.value == "##")
-        token.type = TokenType::HASH_HASH;
-    else if (token.value == ";")
-        token.type = TokenType::SEMICOLON;
-    else if (token.value == ":")
-        token.type = TokenType::COLON;
-    else if (token.value == "...")
-        token.type = TokenType::ELLIPSIS;
+    if (token_value == "{")
+        return TokenType::OPEN_BRACE;
+    else if (token_value == "}")
+        return TokenType::CLOSE_BRACE;
+    else if (token_value == "[")
+        return TokenType::OPEN_BRACKET;
+    else if (token_value == "]")
+        return TokenType::CLOSE_BRACKET;
+    else if (token_value == "(")
+        return TokenType::OPEN_PARENS;
+    else if (token_value == ")")
+        return TokenType::CLOSE_PARENS;
+    else if (token_value == ".")
+        return TokenType::DOT;
+    else if (token_value == "->")
+        return TokenType::SELECTION;
+    else if (token_value == "++")
+        return TokenType::PLUS_PLUS;
+    else if (token_value == "--")
+        return TokenType::MINUS_MINUS;
+    else if (token_value == "&")
+        return TokenType::AND;
+    else if (token_value == "*")
+        return TokenType::STAR;
+    else if (token_value == "+")
+        return TokenType::PLUS;
+    else if (token_value == "-")
+        return TokenType::MINUS;
+    else if (token_value == "~")
+        return TokenType::TILDE;
+    else if (token_value == "!")
+        return TokenType::NOT;
+    else if (token_value == "/")
+        return TokenType::SLASH;
+    else if (token_value == "%")
+        return TokenType::PERCENT;
+    else if (token_value == "<<")
+        return TokenType::LESS_LESS;
+    else if (token_value == ">>")
+        return TokenType::GREATER_GREATER;
+    else if (token_value == "<")
+        return TokenType::LESS_THAN;
+    else if (token_value == ">")
+        return TokenType::GREATER_THAN;
+    else if (token_value == "<=")
+        return TokenType::LESS_EQUAL;
+    else if (token_value == ">=")
+        return TokenType::GREATER_EQUAL;
+    else if (token_value == "==")
+        return TokenType::EQUAL_EQUAL;
+    else if (token_value == "!=")
+        return TokenType::NOT_EQUAL;
+    else if (token_value == "^")
+        return TokenType::XOR;
+    else if (token_value == "|")
+        return TokenType::OR;
+    else if (token_value == "&&")
+        return TokenType::AND_AND;
+    else if (token_value == "||")
+        return TokenType::OR_OR;
+    else if (token_value == "=")
+        return TokenType::EQUAL;
+    else if (token_value == "*=")
+        return TokenType::STAR_EQUAL;
+    else if (token_value == "/=")
+        return TokenType::SLASH_EQUAL;
+    else if (token_value == "%=")
+        return TokenType::PERCENT_EQUAL;
+    else if (token_value == "+=")
+        return TokenType::PLUS_EQUAL;
+    else if (token_value == "-=")
+        return TokenType::MINUS_EQUAL;
+    else if (token_value == "<<=")
+        return TokenType::LESS_LESS_EQUAL;
+    else if (token_value == ">>=")
+        return TokenType::GREATER_GREATER_EQUAL;
+    else if (token_value == "&=")
+        return TokenType::AND_EQUAL;
+    else if (token_value == "^=")
+        return TokenType::XOR_EQUAL;
+    else if (token_value == "|=")
+        return TokenType::OR_EQUAL;
+    else if (token_value == ",")
+        return TokenType::COMMA;
+    else if (token_value == "#")
+        return TokenType::HASH;
+    else if (token_value == "##")
+        return TokenType::HASH_HASH;
+    else if (token_value == ";")
+        return TokenType::SEMICOLON;
+    else if (token_value == ":")
+        return TokenType::COLON;
+    else if (token_value == "...")
+        return TokenType::ELLIPSIS;
 
-    if (token.type == TokenType::UNKNOWN)
-        return false;
-    return false;
+    return TokenType::UNKNOWN;
 };
 
 void logTokenCreation(const Token& token, const int& depth) {
