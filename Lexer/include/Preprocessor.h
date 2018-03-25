@@ -16,6 +16,7 @@ class Preprocessor {
 public:
     Preprocessor();
     Preprocessor(char* filepath);
+    Preprocessor(Scanner existingScanner);
 
     Token getNextToken();
 private:

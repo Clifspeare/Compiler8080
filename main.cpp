@@ -6,12 +6,13 @@
 
 int main() {
     char filepath[]="hello_world.c";
-    Preprocessor lexer(filepath);
+    Scanner lexer(filepath);
+    Preprocessor preprocessor(lexer);
     Token token;
     int counter = 0;
-    token = lexer.getNextToken();
+    token = preprocessor.getNextToken();
     while (token.value != "end") {
-        token = lexer.getNextToken();
+        token = preprocessor.getNextToken();
     }
     std::cout << "end reached" << std::endl;
     return 0;

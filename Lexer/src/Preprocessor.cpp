@@ -76,3 +76,6 @@ Token Preprocessor::getDefinitionReplacement(std::string idStringToBeReplaced)
 
 Preprocessor::Preprocessor(char *filepath) : m_scanner(filepath) {
 }
+
+Preprocessor::Preprocessor(Scanner existingScanner) : m_scanner(existingScanner) {
+}
