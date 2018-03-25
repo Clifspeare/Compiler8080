@@ -9,14 +9,8 @@
 #include <stack>
 #include <array>
 #include <iostream>
+#include <memory>
 #include "utility_functions.h"
-
-// Need to write fstream that reads in spaces and new lines in getNextToken.
-
-struct source_file {
-    std::ifstream* buffer;
-    int index = 0;
-};
 
 class Scanner {
 public:
@@ -77,8 +71,8 @@ private:
             std::make_pair("goto", TokenType::GOTO)
     };
 
-    source_file *m_current_file;
-    std::stack<source_file> m_source_files;
+    std::shared_ptr<std::ifstream> m_current_file;
+    std::stack<std::shared_ptr<std::ifstream>> m_source_files;
 };
 
 

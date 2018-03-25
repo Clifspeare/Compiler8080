@@ -15,31 +15,30 @@ bool Scanner::checkSetReservedWord(Token& token)
 }
 
 void Scanner::loadSourceFile(const char* filepath){
-    source_file n_source;
-    n_source.buffer = new std::ifstream(filepath);
-    n_source.index = 0;
     depth++;
-    m_source_files.push(n_source);
-    m_current_file = &m_source_files.top();
+    m_source_files.push(std::make_shared<std::ifstream>(filepath));
+    m_current_file = m_source_files.top();
 }
 
 void Scanner::popSourceFile()
 {
     m_source_files.pop();
-    m_current_file = &m_source_files.top();
     depth--;
+    if (!m_source_files.empty()) {
+        m_current_file = m_source_files.top();
+    } else {
+        m_current_file = nullptr;
+    }
 }
 
 char Scanner::getNextChar()
 {
-    m_current_file->index++;
-    return m_current_file->buffer->get();
+    return m_current_file->get();
 }
 
 void Scanner::unGetChar(char character)
 {
-    m_current_file->index--;
-    m_current_file->buffer->putback(character);
+    m_current_file->putback(character);
 }
 
 Token Scanner::getNextToken()
@@ -56,11 +55,9 @@ Token Scanner::getNextToken()
         if(m_source_files.empty()) {
             token.value = "end";
             end = true;
-            return token;
         }
         else {
             token.value = "eof";
-            return token;
         }
     }
 
@@ -221,8 +218,6 @@ Scanner::Scanner() {
 
 //TODO delete allocated ifstream when source_files are removed from stack
 Scanner::Scanner(char* filepath) {
-    source_file currentFile;
-    currentFile.buffer = new std::ifstream(filepath);
-    m_source_files.push(currentFile);
-    m_current_file = &m_source_files.top();
+    m_source_files.push(std::make_shared<std::ifstream>(filepath));
+    m_current_file = m_source_files.top();
 }

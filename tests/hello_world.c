@@ -3,5 +3,5 @@
 int main()
 {
     printf("%i",doStuff());
-    return 0;
+    return 0.01;
 }
