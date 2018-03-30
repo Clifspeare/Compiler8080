@@ -31,7 +31,7 @@ Token Preprocessor::getNextToken() {
                 } else {
                     std::cout << "ERROR" << std::endl;
                 }
-                return m_scanner.getNextToken();
+                token = getNextToken();
             }
             // Handle #define.
             else if (token.value == "define") {
@@ -39,6 +39,7 @@ Token Preprocessor::getNextToken() {
                 if (token.type == TokenType::ID) {
                     Token destToken = m_scanner.getNextToken();
                     addDefinition(token, destToken);
+                    token = getNextToken();
                 }
             }
         }
