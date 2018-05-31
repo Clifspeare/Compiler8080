@@ -134,6 +134,38 @@ Token Scanner::getNextToken()
             case '/':
                 if (c == '=') // divide assign
                     token.value += c;
+                else if (c == '/') {
+                    token.value += c;
+                    c = getNextChar();
+                    while (c != '\n') {
+                        token.value += c;
+                        c = getNextChar();
+                    }
+                }
+                else if (c == '*') {
+                    token.value += c;
+                    c = getNextChar();
+                    bool comment_end = false;
+                    while (!comment_end) {
+                        if (c != '*') {
+                            token.value += c;
+                        } else { // c == '*'
+                            char temp = c;
+                            c = getNextChar();
+                            if (c == '/') {
+                                comment_end = true;
+                            } else {
+                                token.value += temp;
+                                token.value += c;
+                            }
+                        }
+                        c = getNextChar();
+                    }
+                    while (c != '*') {
+                        token.value += c;
+                        c = getNextChar();
+                    }
+                }
             case '*':
                 if (c == '=') // multiply assign
                     token.value += c;
