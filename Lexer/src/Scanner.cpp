@@ -143,6 +143,7 @@ Token Scanner::getNextToken()
                     }
                 }
                 else if (c == '*') {
+                    std::cout << "IN MULTILINE" << std::endl;
                     token.value += c;
                     c = getNextChar();
                     bool comment_end = false;
@@ -150,19 +151,14 @@ Token Scanner::getNextToken()
                         if (c != '*') {
                             token.value += c;
                         } else { // c == '*'
-                            char temp = c;
                             c = getNextChar();
                             if (c == '/') {
                                 comment_end = true;
                             } else {
-                                token.value += temp;
+                                token.value += '*';
                                 token.value += c;
                             }
                         }
-                        c = getNextChar();
-                    }
-                    while (c != '*') {
-                        token.value += c;
                         c = getNextChar();
                     }
                 }
