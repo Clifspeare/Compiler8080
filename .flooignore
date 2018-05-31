@@ -4,7 +4,4 @@ tmp
 vendor
 .idea/workspace.xml
 .idea/misc.xml
-cmake-build-debug
 cmake-build-debug/
-.idea/
-.git/

@@ -1,4 +1,5 @@
-#include <stdio.h>
+// TEST FILE
+
 #define MAX 3
 int addition(int num1, int num2)
 {

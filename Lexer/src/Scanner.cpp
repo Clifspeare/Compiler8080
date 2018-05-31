@@ -183,7 +183,7 @@ Token Scanner::getNextToken()
                     token.value += c;
             case '.':
                 char third_char = getNextChar();
-                if (c == '.' && third_char == '.') { // elipsis
+                if (c == '.' && third_char == '.') { // ellipsis
                     token.value += c + third_char;
                 } else {
                     unGetChar(third_char); // unget extra/unhandled 3rd char

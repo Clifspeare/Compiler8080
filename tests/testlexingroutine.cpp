@@ -6,10 +6,10 @@
 #include <cstring>
 
 int main(int argc, char *argv[]) {
-    char filepath[]="hello_world.c";
+    char filepath[]="input_file.c";
 
     bool doRawLog = false;
-    bool print = false;
+    bool print = true;
     if (argc > 1) {
         if (strcmp(argv[1], "-log") == 0) {
             doRawLog = true;
