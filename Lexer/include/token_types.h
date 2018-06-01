@@ -12,7 +12,7 @@ enum class TokenType
     ID,
     CONSTANT,
     LITERAL,
-
+    COMMENT,
     // preprocessors
     PREPROCESSOR_SYMBOL,
     DEFINE,
