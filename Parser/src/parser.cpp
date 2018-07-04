@@ -40,9 +40,34 @@ bool Parser::external_declaration(std::unique_ptr<Node>& node)
     }
 }
 
-bool Parser::function_definition(std::unique_ptr<Node>& node) {}
-bool Parser::declaration_specifier(std::unique_ptr<Node>& node) {}
-bool Parser::storage_class_specifier(std::unique_ptr<Node>& node) {}
+bool Parser::function_definition(std::unique_ptr<Node>& node)
+{
+    std::unique_ptr<Node> child = std::make_unique<Node>();
+    while (declaration_specifier(child));
+    if (!declarator(child))
+        return false;
+    while (declaration(child));
+    if (!compound_statement(child))
+        return false;
+
+    node->type = Type::FUNCTION_DEFINITION;
+    node->children.push_back(std::move(child));
+}
+bool Parser::declaration_specifier(std::unique_ptr<Node>& node)
+{
+    std::unique_ptr<Node> child = std::make_unique<Node>();
+    if (storage_class_specifier(child) || type_specifier(child) || type_qualifier(child)) {
+        node->type = Type::DECLARATION_SPECIFIER;
+        node->children.push_back(std::move(child));
+    }
+    return false;
+}
+bool Parser::storage_class_specifier(std::unique_ptr<Node>& node)
+{
+    if (CheckToken(std::vector<TokenType>({TokenType::AUTO, TokenType::REGISTER, TokenType::STATIC, TokenType::EXTERN, TokenType::TYPEDEF}))) {
+        // child node of storage_class_specifier OR *value* of storage_class_specifier
+    }
+}
 bool Parser::type_specifier(std::unique_ptr<Node>& node) {}
 bool Parser::struct_or_union_specifer(std::unique_ptr<Node>& node) {}
 bool Parser::struct_or_union(std::unique_ptr<Node>& node) {}
