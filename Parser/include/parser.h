@@ -22,6 +22,7 @@ enum class Type
     IDENTIFIER,
     CONSTANT,
     STRING,
+    COMMA
 };
 
 template <class T>

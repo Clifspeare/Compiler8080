@@ -231,10 +231,44 @@ std::unique_ptr<Node> Parser::expression()
     if (assignment_expression_node->accepted) {
         self->accepted = true;
         self->children.push_back(std::move(assignment_expression_node));
+
+        // Here, we save the index into our token list because we will be progressing through the input until such time as we
+        // pass the last token usable by us.  We will always have to backtrack at least one token.
+        int input_index = m_tokenIndex;
+        Token tok = getNextToken();
+        bool still_recursing = true;
+        while (still_recursing) {
+            if (tok.type == TokenType::COMMA) {
+                std::unique_ptr<Node> comma_node = std::make_unique<Node>();
+                comma_node->accepted = true;
+                comma_node->type = Type::COMMA;
+                comma_node->data = tok.value;
+
+                std::unique_ptr<Node> inner_assignment_expression_node = assignment_expression();
+                if (inner_assignment_expression_node->accepted) { // Both the comma and assignment-expression are valid, so we can add them to the expression node and continue
+                    self->children.push_back(std::move(comma_node));
+                    self->children.push_back(std::move(inner_assignment_expression_node));
+                } else { // Comma was valid, but assignment-expression wasn't, so neither can be added.  And stop looping.
+                    still_recursing = false;
+
+                    // restore token index from before comma
+                    m_tokenIndex = input_index;
+                }
+
+            } else { // stop looping to continue expression, and add the token (which we can't use) back on the input
+                still_recursing = false;
+                --m_tokenIndex;
+            }
+
+            // update input_input after correct loop pass
+            input_index = m_tokenIndex;
+        }
     } else {
-        // next rule, Expression ::= Expression , Assignment-Expression
-        // This is left-recursive, and so I will leave it for later.
+        self->accepted = false;
+        self->children.push_back(std::move(assignment_expression_node));
     }
+
+    return self;
 
 }
 std::unique_ptr<Node> Parser::assignment_expression() {}
