@@ -326,60 +326,70 @@ std::unique_ptr<Node> Parser::assignment_operator()
         assign_multiply_result_node->accepted = true;
         assign_multiply_result_node->type = Type::MULTIPLICATION_ASSIGNMENT;
         assign_multiply_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_multiply_result_node));
     } else if (tok.type == TokenType::SLASH_EQUAL) {
         // /=
         std::unique_ptr<Node> assign_divide_result_node = std::make_unique<Node>();
         assign_divide_result_node->accepted = true;
         assign_divide_result_node->type = Type::DIVISION_ASSIGNMENT;
         assign_divide_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_divide_result_node));
     } else if (tok.type == TokenType::PERCENT_EQUAL) {
         // %=
         std::unique_ptr<Node> assign_modulus_result_node = std::make_unique<Node>();
         assign_modulus_result_node->accepted = true;
         assign_modulus_result_node->type = Type::MODULUS_ASSIGNMENT;
         assign_modulus_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_modulus_result_node));
     } else if (tok.type == TokenType::PLUS_EQUAL) {
         // +=
         std::unique_ptr<Node> assign_addition_result_node = std::make_unique<Node>();
         assign_addition_result_node->accepted = true;
         assign_addition_result_node->type = Type::ADDITION_ASSIGNMENT;
         assign_addition_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_addition_result_node));
     } else if (tok.type == TokenType::MINUS_EQUAL) {
         // -=
         std::unique_ptr<Node> assign_subtraction_result_node = std::make_unique<Node>();
         assign_subtraction_result_node->accepted = true;
         assign_subtraction_result_node->type = Type::SUBTRACTION_ASSIGNMENT;
         assign_subtraction_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_subtraction_result_node));
     } else if (tok.type == TokenType::LESS_LESS_EQUAL) {
         // <<=
         std::unique_ptr<Node> assign_left_shift_result_node = std::make_unique<Node>();
         assign_left_shift_result_node->accepted = true;
         assign_left_shift_result_node->type = Type::LEFTSHIFT_ASSIGNMENT;
         assign_left_shift_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_left_shift_result_node));
     } else if (tok.type == TokenType::GREATER_GREATER_EQUAL) {
         // >>=
         std::unique_ptr<Node> assign_right_shift_result_node = std::make_unique<Node>();
         assign_right_shift_result_node->accepted = true;
         assign_right_shift_result_node->type = Type::RIGHTSHIFT_ASSIGNMENT;
         assign_right_shift_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_right_shift_result_node));
     } else if (tok.type == TokenType::AND_EQUAL) {
         // &=
         std::unique_ptr<Node> assign_bitwise_and_result_node = std::make_unique<Node>();
         assign_bitwise_and_result_node->accepted = true;
         assign_bitwise_and_result_node->type = Type::BITWISE_AND_ASSIGNMENT;
         assign_bitwise_and_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_bitwise_and_result_node));
     } else if (tok.type == TokenType::XOR_EQUAL) {
         // ^=
         std::unique_ptr<Node> assign_xor_result_node = std::make_unique<Node>();
         assign_xor_result_node->accepted = true;
         assign_xor_result_node->type = Type::XOR_ASSIGNMENT;
         assign_xor_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_xor_result_node));
     } else if (tok.type == TokenType::OR_EQUAL) {
         // |=
         std::unique_ptr<Node> assign_bitwise_or_result_node = std::make_unique<Node>();
         assign_bitwise_or_result_node->accepted = true;
         assign_bitwise_or_result_node->type = Type::BITWISE_OR_ASSIGNMENT;
         assign_bitwise_or_result_node->data = tok.value;
+        self->children.push_back(std::move(assign_bitwise_or_result_node));
     } else { // Error, token does not match expected terminal.
         std::unique_ptr<Node> error_node = std::make_unique<Node>();
         error_node->type = Type::ERROR;
@@ -387,13 +397,62 @@ std::unique_ptr<Node> Parser::assignment_operator()
         self->children.push_back(error_node);
         self->accepted = false;
     }
-    // TODO: complete
+
     return self;
 }
 
-bool Parser::unary_operator(std::unique_ptr<Node>& node)
+std::unique_ptr<Node> Parser::unary_operator()
 {
-    CheckToken(std::vector<TokenType>({}));
+    std::unique_ptr<Node> self = std::make_unique<Node>();
+    self->type = Type::UNARY_OPERATOR;
+
+    Token tok = getNextToken();
+
+    if (tok.type == TokenType::AND) {
+        std::unique_ptr<Node> unary_and_node = std::make_unique<Node>();
+        unary_and_node->accepted = true;
+        unary_and_node->type = Type::UNARY_AND;
+        unary_and_node->data = tok.value;
+        self->children.push_back(std::move(unary_and_node));
+    } else if (tok.type == TokenType::STAR) {
+        std::unique_ptr<Node> pointer_op_node = std::make_unique<Node>();
+        pointer_op_node->accepted = true;
+        pointer_op_node->type = Type::POINTER_OP;
+        pointer_op_node->data = tok.value;
+        self->children.push_back(std::move(pointer_op_node));
+    } else if (tok.type == TokenType::PLUS) {
+        std::unique_ptr<Node> unary_positive_node = std::make_unique<Node>();
+        unary_positive_node->accepted = true;
+        unary_positive_node->type = Type::UNARY_POSITIVE;
+        unary_positive_node->data = tok.value;
+        self->children.push_back(std::move(unary_positive_node));
+    } else if (tok.type == TokenType::MINUS) {
+        std::unique_ptr<Node> unary_negative_node = std::make_unique<Node>();
+        unary_negative_node->accepted = true;
+        unary_negative_node->type = Type::UNARY_NEGATIVE;
+        unary_negative_node->data = tok.value;
+        self->children.push_back(std::move(unary_negative_node));
+    } else if (tok.type == TokenType::TILDE) {
+        std::unique_ptr<Node> bitwise_not_node = std::make_unique<Node>();
+        bitwise_not_node->accepted = true;
+        bitwise_not_node->type = Type::BITWISE_NOT;
+        bitwise_not_node->data = tok.value;
+        self->children.push_back(std::move(bitwise_not_node));
+    } else if (tok.type == TokenType::NOT) {
+        std::unique_ptr<Node> unary_not_node = std::make_unique<Node>();
+        unary_not_node->accepted = true;
+        unary_not_node->type = Type::UNARY_NOT;
+        unary_not_node->data = tok.value;
+        self->children.push_back(std::move(unary_not_node));
+    } else {
+        std::unique_ptr<Node> error_node = std::make_unique<Node>();
+        error_node->type = Type::ERROR;
+        error_node->data = tok.value;
+        self->children.push_back(error_node);
+        self->accepted = false;
+    }
+
+    return self;
 }
 bool Parser::type_name(std::unique_ptr<Node>& node) {}
 bool Parser::parameter_type_list(std::unique_ptr<Node>& node) {}
