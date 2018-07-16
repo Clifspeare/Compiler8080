@@ -3,9 +3,19 @@
 #include <memory>
 #include <iostream>
 
-Parser::Parser() : m_root()
+Parser::Parser() : m_preprocessor(), m_root(), m_errors(), m_tokens()
 {
     m_root = std::make_unique<Node>();
+    Token tok = m_preprocessor.getNextToken();
+    while (tok.value != "end" && tok.value != "eof") {
+        m_tokens.push_back(tok);
+        tok = m_preprocessor.getNextToken();
+    }
+}
+
+Token Parser::getNextToken()
+{
+    return m_tokens.at(m_tokenIndex++);
 }
 
 bool Parser::BuildTree() {
@@ -24,44 +34,12 @@ void Parser::showErrors()
     }
 }
 
-// bool Parser::translation_unit(std::unique_ptr<Node>& node)
-// {
-//     std::unique_ptr<Node> child = std::make_unique<Node>();
-
-//     // PROCCESS FILE
-//     if (external_declaration(child)) {
-//         node->type = Type::TRANSLATION_UNIT;
-//         node->children.push_back(std::move(child));
-//         return true;
-//     }
-//     return false;
-// }
-
-// std::unique_ptr<Node> Parser::translation_unit(std::unique_ptr<Node> parent)
-// {
-//     std::unique_ptr<Node> self = std::make_unique<Node>();
-//     self->type = Type::TRANSLATION_UNIT;
-
-//     if (external_declaration_node != NULL) {
-//         self->parent = parent;
-//         parent->children.push_back(std::move(self));
-//     } else {
-//         // create error message with parent.children[0]->type and token recieved
-//     }
-// }
-
 std::unique_ptr<Node> Parser::translation_unit()
 {
     std::unique_ptr<Node> self = std::make_unique<Node>();
     self->type = Type::TRANSLATION_UNIT;
 
     std::unique_ptr<Node> external_declaration_node = external_declaration();
-
-    /* There are two cases where external_declaration will return a nullptr:
-    * 1. When the end of input is reached, and when there is an error.
-    * 2. When an external_declaration can not be formed from the input (a parse error/malformed input)
-    * To disambiguate between the two
-    */
 
     while (external_declaration_node != nullptr) {
         self->children.push_back(std::move(external_declaration_node));
@@ -110,7 +88,7 @@ std::unique_ptr<Node> Parser::function_definition()
     self->type = Type::FUNCTION_DEFINITION;
 
     // CHECK FOR RETURN VALUES - TODO: Handle special cases (int int, long long long, ect..)
-    std::unique_ptr<Node> declaration_specifier_node
+    std::unique_ptr<Node> declaration_specifier_node;
     while (declaration_specifier(child));
     // CHECK FOR FUNCTION NAME
     if (!declarator(child))
@@ -178,10 +156,88 @@ bool Parser::multiplicative_expression(std::unique_ptr<Node>& node) {}
 bool Parser::cast_expression(std::unique_ptr<Node>& node) {}
 bool Parser::unary_expression(std::unique_ptr<Node>& node) {}
 bool Parser::postfix_expression(std::unique_ptr<Node>& node) {}
-bool Parser::primary_expression(std::unique_ptr<Node>& node) {}
-bool Parser::constant(std::unique_ptr<Node>& node) {}
-bool Parser::expression(std::unique_ptr<Node>& node) {}
-bool Parser::assignment_expression(std::unique_ptr<Node>& node) {}
+std::unique_ptr<Node> Parser::primary_expression()
+{
+    /*
+    * Primary expression is the most basic form of expression, consisting of an identifier, string-literal, or numeric-constant.
+    * It can be surrounded by any number of parentheses?
+    */
+   std::unique_ptr<Node> self = std::make_unique<Node>();
+   self->type = Type::PRIMARY_EXPRESSION;
+
+   // primary_expression is NOT an error handling node, so we don't save m_tokenIndex here prior to getNextToken
+   Token nextToken = getNextToken();
+   if (nextToken.type == TokenType::ID) {
+       std::unique_ptr<Node> identifier_node = std::make_unique<Node>();
+       identifier_node->type = Type::IDENTIFIER;
+       identifier_node->accepted = true;
+       // TODO: identifier_node.value or .data, etc should 'point' to an entry in a symbol table describing the identifier
+       // For now, just the name
+       identifier_node->data = nextToken.value;
+       self->children.push_back(std::move(identifier_node));
+   } else if (nextToken.type == TokenType::CONSTANT) {
+       std::unique_ptr<Node> numeric_node = std::make_unique<Node>();
+       numeric_node->type = Type::CONSTANT;
+       numeric_node->accepted = true;
+       numeric_node->data = nextToken.value;
+       self->children.push_back(std::move(numeric_node));
+   } else if (nextToken.type == TokenType::LITERAL) {
+       std::unique_ptr<Node> string_node = std::make_unique<Node>();
+       string_node->type = Type::STRING;
+       string_node->accepted = true;
+       // Should be in string literal table...
+       string_node->data = nextToken.value;
+       self->children.push_back(std::move(string_node));
+   } else if (nextToken.type == TokenType::OPEN_PARENS) {
+       std::unique_ptr<Node> left_parens = std::make_unique<Node>();
+       std::unique_ptr<Node> expression_node = expression();
+       std::unique_ptr<Node> right_parens = std::make_unique<Node>();
+
+       left_parens->accepted = true;
+       self->children.push_back(std::move(left_parens));
+       self->children.push_back(std::move(expression_node));
+       if (!expression_node->accepted) {
+           self->accepted = false;
+       } else {
+           nextToken = getNextToken();
+           if (nextToken.type != TokenType::CLOSE_PARENS) {
+               self->accepted = false;
+               std::unique_ptr<Node> error_node = std::make_unique<Node>();
+               error_node->type = Type::ERROR;
+               error_node->data = nextToken.value;
+               self->children.push_back(error_node);
+            } else {
+                self->children.push_back(std::move(right_parens));
+                self->accepted = true;
+            }
+       }
+   } else {
+       std::unique_ptr<Node> error_node = std::make_unique<Node>();
+       error_node->type = Type::ERROR;
+       error_node->data = nextToken.value;
+       self->children.push_back(error_node);
+       self->accepted = false;
+   }
+
+   return self;
+}
+std::unique_ptr<Node> Parser::constant() {}
+std::unique_ptr<Node> Parser::expression()
+{
+    std::unique_ptr<Node> self = std::make_unique<Node>();
+    self->type = Type::EXPRESSION;
+
+    std::unique_ptr<Node> assignment_expression_node = assignment_expression();
+    if (assignment_expression_node->accepted) {
+        self->accepted = true;
+        self->children.push_back(std::move(assignment_expression_node));
+    } else {
+        // next rule, Expression ::= Expression , Assignment-Expression
+        // This is left-recursive, and so I will leave it for later.
+    }
+
+}
+std::unique_ptr<Node> Parser::assignment_expression() {}
 bool Parser::assignment_operator(std::unique_ptr<Node>& node) {}
 bool Parser::unary_operator(std::unique_ptr<Node>& node)
 {

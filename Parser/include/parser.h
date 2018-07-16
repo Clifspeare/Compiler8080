@@ -6,6 +6,7 @@
 
 enum class Type
 {
+    ERROR,
     TRANSLATION_UNIT,
     EXTERNAL_DECLARATION,
     FUNCTION_DEFINITION,
@@ -14,8 +15,13 @@ enum class Type
     STORAGE_CLASS_SPECIFIER,
     TYPE_SPECIFIER,
     DECLARATOR,
+    PRIMARY_EXPRESSION,
+    JUMP_STATEMENT,
+    EXPRESSION,
 
-    JUMP_STATEMENT
+    IDENTIFIER,
+    CONSTANT,
+    STRING,
 };
 
 template <class T>
@@ -39,6 +45,7 @@ public:
     Type type;
     Node* parent;
     std::vector<std::unique_ptr<Node>> children;
+    bool accepted;
 };
 
 class Parser {
@@ -51,6 +58,12 @@ private:
     std::unique_ptr<Node> m_root;
     std::vector<std::string> m_errors;
 
+    // TODO: make this better.
+    Token getNextToken();
+    int m_tokenIndex = 0;
+    std::vector<Token> m_tokens;
+
+    // error-handling
     void reportError(const std::string& errorString);
     void showErrors();
 
@@ -59,59 +72,59 @@ private:
     std::unique_ptr<Node> translation_unit();
     std::unique_ptr<Node> Parser::external_declaration();
     std::unique_ptr<Node> function_definition();
-    bool declaration_specifier(std::unique_ptr<Node>& node);
-    bool storage_class_specifier(std::unique_ptr<Node>& node);
-    bool type_specifier(std::unique_ptr<Node>& node);
-    bool struct_or_union_specifer(std::unique_ptr<Node>& node);
-    bool struct_or_union(std::unique_ptr<Node>& node);
-    bool struct_declaration(std::unique_ptr<Node>& node);
-    bool specifier_qualifier(std::unique_ptr<Node>& node);
-    bool struct_declarator_list(std::unique_ptr<Node>& node);
-    bool struct_declarator(std::unique_ptr<Node>& node);
-    bool declarator(std::unique_ptr<Node>& node);
-    bool pointer(std::unique_ptr<Node>& node);
-    bool type_qualifier(std::unique_ptr<Node>& node);
-    bool direct_declarator(std::unique_ptr<Node>& node);
-    bool constant_expression(std::unique_ptr<Node>& node);
-    bool logical_or_expression(std::unique_ptr<Node>& node);
-    bool logical_and_expression(std::unique_ptr<Node>& node);
-    bool inclusive_or_expression(std::unique_ptr<Node>& node);
-    bool and_expression(std::unique_ptr<Node>& node);
-    bool equality_expression(std::unique_ptr<Node>& node);
-    bool relational_expression(std::unique_ptr<Node>& node);
-    bool shift_expression(std::unique_ptr<Node>& node);
-    bool additive_expression(std::unique_ptr<Node>& node);
-    bool multiplicative_expression(std::unique_ptr<Node>& node);
-    bool cast_expression(std::unique_ptr<Node>& node);
-    bool unary_expression(std::unique_ptr<Node>& node);
-    bool postfix_expression(std::unique_ptr<Node>& node);
-    bool primary_expression(std::unique_ptr<Node>& node);
-    bool constant(std::unique_ptr<Node>& node);
-    bool expression(std::unique_ptr<Node>& node);
-    bool assignment_expression(std::unique_ptr<Node>& node);
-    bool assignment_operator(std::unique_ptr<Node>& node);
-    bool unary_operator(std::unique_ptr<Node>& node);
-    bool type_name(std::unique_ptr<Node>& node);
-    bool parameter_type_list(std::unique_ptr<Node>& node);
-    bool parameter_list(std::unique_ptr<Node>& node);
-    bool parameter_declaration(std::unique_ptr<Node>& node);
-    bool abstract_declarator(std::unique_ptr<Node>& node);
-    bool direct_abstract_declarator(std::unique_ptr<Node>& node);
-    bool enum_specifer(std::unique_ptr<Node>& node);
-    bool enumerator_list(std::unique_ptr<Node>& node);
-    bool enumerator(std::unique_ptr<Node>& node);
-    bool typedef_name(std::unique_ptr<Node>& node);
+    std::unique_ptr<Node> declaration_specifier();
+    std::unique_ptr<Node> storage_class_specifier();
+    std::unique_ptr<Node> type_specifier();
+    std::unique_ptr<Node> struct_or_union_specifer();
+    std::unique_ptr<Node> struct_or_union();
+    std::unique_ptr<Node> struct_declaration();
+    std::unique_ptr<Node> specifier_qualifier();
+    std::unique_ptr<Node> struct_declarator_list();
+    std::unique_ptr<Node> struct_declarator();
+    std::unique_ptr<Node> declarator();
+    std::unique_ptr<Node> pointer();
+    std::unique_ptr<Node> type_qualifier();
+    std::unique_ptr<Node> direct_declarator();
+    std::unique_ptr<Node> constant_expression();
+    std::unique_ptr<Node> logical_or_expression();
+    std::unique_ptr<Node> logical_and_expression();
+    std::unique_ptr<Node> inclusive_or_expression();
+    std::unique_ptr<Node> and_expression();
+    std::unique_ptr<Node> equality_expression();
+    std::unique_ptr<Node> relational_expression();
+    std::unique_ptr<Node> shift_expression();
+    std::unique_ptr<Node> additive_expression();
+    std::unique_ptr<Node> multiplicative_expression();
+    std::unique_ptr<Node> cast_expression();
+    std::unique_ptr<Node> unary_expression();
+    std::unique_ptr<Node> postfix_expression();
+    std::unique_ptr<Node> primary_expression();
+    std::unique_ptr<Node> constant();
+    std::unique_ptr<Node> expression();
+    std::unique_ptr<Node> assignment_expression();
+    std::unique_ptr<Node> assignment_operator();
+    std::unique_ptr<Node> unary_operator();
+    std::unique_ptr<Node> type_name();
+    std::unique_ptr<Node> parameter_type_list();
+    std::unique_ptr<Node> parameter_list();
+    std::unique_ptr<Node> parameter_declaration();
+    std::unique_ptr<Node> abstract_declarator();
+    std::unique_ptr<Node> direct_abstract_declarator();
+    std::unique_ptr<Node> enum_specifer();
+    std::unique_ptr<Node> enumerator_list();
+    std::unique_ptr<Node> enumerator();
+    std::unique_ptr<Node> typedef_name();
     std::unique_ptr<Node> declaration();
-    bool init_declarator(std::unique_ptr<Node>& node);
-    bool initializer(std::unique_ptr<Node>& node);
-    bool initializer_list(std::unique_ptr<Node>& node);
-    bool compound_statement(std::unique_ptr<Node>& node);
-    bool statement(std::unique_ptr<Node>& node);
-    bool labeled_statement(std::unique_ptr<Node>& node);
-    bool expression_statement(std::unique_ptr<Node>& node);
-    bool selection_statement(std::unique_ptr<Node>& node);
-    bool iteration_statement(std::unique_ptr<Node>& node);
-    bool jump_statement(std::unique_ptr<Node>& node);
+    std::unique_ptr<Node> init_declarator();
+    std::unique_ptr<Node> initializer();
+    std::unique_ptr<Node> initializer_list();
+    std::unique_ptr<Node> compound_statement();
+    std::unique_ptr<Node> statement();
+    std::unique_ptr<Node> labeled_statement();
+    std::unique_ptr<Node> expression_statement();
+    std::unique_ptr<Node> selection_statement();
+    std::unique_ptr<Node> iteration_statement();
+    std::unique_ptr<Node> jump_statement();
 
     bool CheckToken(std::vector<TokenType> tokenList);
     bool CheckTokenPair(TokenType token1, TokenType token2);

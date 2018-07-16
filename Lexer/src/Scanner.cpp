@@ -235,7 +235,7 @@ Token Scanner::getNextToken()
     if (extraCharNeedsPutback) {
         unGetChar(c);
     }
-    if (token.type == TokenType::WS) {
+    if (token.type == TokenType::WS || token.type == TokenType::COMMENT) {
         return getNextToken();
     }
     return token;
