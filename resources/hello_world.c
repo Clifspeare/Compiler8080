@@ -2,6 +2,7 @@
 
 int main()
 {
-    printf("%i",doStuff());
+    int sum;
+    printf("%d", sum);
     return 0.01;
 }

@@ -13,6 +13,7 @@ enum class Type
     DECLARATION_SPECIFIER,
     STORAGE_CLASS_SPECIFIER,
     TYPE_SPECIFIER,
+    DECLARATOR,
 
     JUMP_STATEMENT
 };
@@ -48,10 +49,16 @@ public:
 private:
     Preprocessor m_preprocessor;
     std::unique_ptr<Node> m_root;
+    std::vector<std::string> m_errors;
 
-    bool translation_unit(std::unique_ptr<Node>& node);
-    bool external_declaration(std::unique_ptr<Node>& node);
-    bool function_definition(std::unique_ptr<Node>& node);
+    void reportError(const std::string& errorString);
+    void showErrors();
+
+
+    // Recursive-descent non-terminal parsing routines
+    std::unique_ptr<Node> translation_unit();
+    std::unique_ptr<Node> Parser::external_declaration();
+    std::unique_ptr<Node> function_definition();
     bool declaration_specifier(std::unique_ptr<Node>& node);
     bool storage_class_specifier(std::unique_ptr<Node>& node);
     bool type_specifier(std::unique_ptr<Node>& node);
@@ -94,7 +101,7 @@ private:
     bool enumerator_list(std::unique_ptr<Node>& node);
     bool enumerator(std::unique_ptr<Node>& node);
     bool typedef_name(std::unique_ptr<Node>& node);
-    bool declaration(std::unique_ptr<Node>& node);
+    std::unique_ptr<Node> declaration();
     bool init_declarator(std::unique_ptr<Node>& node);
     bool initializer(std::unique_ptr<Node>& node);
     bool initializer_list(std::unique_ptr<Node>& node);
