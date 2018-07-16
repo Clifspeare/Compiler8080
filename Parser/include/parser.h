@@ -18,11 +18,18 @@ enum class Type
     PRIMARY_EXPRESSION,
     JUMP_STATEMENT,
     EXPRESSION,
+    ASSIGNMENT_EXPRESSION,
+    ASSIGNMENT_OPERATOR,
+    MULTIPLICATION_ASSIGNMENT,
+    DIVISION_ASSIGNMENT,
+    MODULUS_ASSIGNMENT,
 
     IDENTIFIER,
     CONSTANT,
     STRING,
-    COMMA
+
+    COMMA,
+    UNARY_ASSIGNMENT
 };
 
 template <class T>
@@ -91,6 +98,7 @@ private:
     std::unique_ptr<Node> logical_and_expression();
     std::unique_ptr<Node> inclusive_or_expression();
     std::unique_ptr<Node> and_expression();
+    std::unique_ptr<Node> conditional_expression();
     std::unique_ptr<Node> equality_expression();
     std::unique_ptr<Node> relational_expression();
     std::unique_ptr<Node> shift_expression();
