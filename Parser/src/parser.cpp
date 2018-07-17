@@ -29,20 +29,9 @@ std::unique_ptr<Node> Parser::translation_unit()
 
     std::unique_ptr<Node> external_declaration_node = external_declaration();
 
-    while (external_declaration_node != nullptr) {
+    while (external_declaration_node->accepted) {
         self->children.push_back(std::move(external_declaration_node));
         external_declaration_node = external_declaration();
-    }
-
-    if (self->children.size() < 1 && m_errors.size() == 0) { // no external declarations formed but no errors reported
-        reportError("Error: end-of-input reached - file is empty");
-        showErrors();
-        return nullptr;
-    } else if (m_errors.size() == 0) { // external declarations formed and no errors
-        return self;
-    } else if (m_errors.size() > 0) { // errors found
-        showErrors();
-        return nullptr;
     }
 }
 
