@@ -134,14 +134,22 @@ std::unique_ptr<Node> Parser::struct_declarator_list() {}
 std::unique_ptr<Node> Parser::struct_declarator() {}
 std::unique_ptr<Node> Parser::declarator()
 {
-    std::unique_ptr<Node> child = std::make_unique<Node>();
-    pointer(child); // zero or one
-    if (direct_declarator(child)) {
-        return false;
+    std::unique_ptr<Node> self = std::make_unique<Node>();
+    self->type = Type::DECLARATOR;
+
+    int saved_token_index = m_tokenIndex;
+    std::unique_ptr<Node> pointer_node = pointer();
+    if (pointer_node->accepted) {
+        self->children.push_back(std::move(pointer_node));
+    } else {
+        m_tokenIndex = saved_token_index;
     }
 
-    node->type = Type::DECLARATOR;
-    node->children.push_back(std::move(child));
+    std::unique_ptr<Node> direct_declarator_node = direct_declarator();
+    self->accepted = direct_declarator_node->accepted;
+    self->children.push_back(std::move(direct_declarator_node));
+
+    return self;
 }
 std::unique_ptr<Node> Parser::pointer()
 {
