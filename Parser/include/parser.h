@@ -23,6 +23,8 @@ public:
     Parser();
     bool BuildTree();
 
+    bool HasTokens();
+
 private:
     Preprocessor m_preprocessor;
     std::unique_ptr<Node> m_root;
@@ -35,7 +37,7 @@ private:
 
     // Recursive-descent non-terminal parsing routines
     std::unique_ptr<Node> translation_unit();
-    std::unique_ptr<Node> Parser::external_declaration();
+    std::unique_ptr<Node> external_declaration();
     std::unique_ptr<Node> function_definition();
     std::unique_ptr<Node> declaration_specifier();
     std::unique_ptr<Node> storage_class_specifier();

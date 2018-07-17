@@ -13,30 +13,76 @@ Parser::Parser() : m_preprocessor(), m_root(), m_errors(), m_tokens()
     }
 }
 
+bool Parser::HasTokens()
+{
+    if(m_tokenIndex == m_tokens.size()){
+        return false;
+    }
+
+    return true;    
+}
+
 Token Parser::getNextToken()
 {
-    return m_tokens.at(m_tokenIndex++);
+    Token t = m_tokens.at(m_tokenIndex++);
+    return t;
 }
 
 bool Parser::BuildTree() {
     m_root = translation_unit();
 }
 
+struct ErrorInfo {
+    Type expected_type;
+    std::string actual_value;
+};
+
+ErrorInfo getErrorInfo(std::unique_ptr<Node>& node)
+{
+    if (node->children.size() == 0) {
+        ErrorInfo err_no;
+        err_no.expected_type = node->type;
+        err_no.actual_value = node->data;
+        return err_no;
+    }
+    for (int i = 0; node->children.size(); ++i) {
+        auto n = std::move(node);
+        if (n->accepted) {
+            return getErrorInfo(n);
+        }
+    }
+}
+
+// FILE(S) ENTRY POINT
 std::unique_ptr<Node> Parser::translation_unit()
 {
+    // CREATE ROOT NODE
     std::unique_ptr<Node> self = std::make_unique<Node>();
     self->type = Type::TRANSLATION_UNIT;
 
-    std::unique_ptr<Node> external_declaration_node = external_declaration();
+    // PROCESS TOKENS
+    while (HasTokens()) {
+        std::unique_ptr<Node> external_declaration_node = external_declaration();
 
-    while (external_declaration_node->accepted) {
-        self->children.push_back(std::move(external_declaration_node));
-        external_declaration_node = external_declaration();
+        if(external_declaration_node->accepted) {
+            self->children.push_back(std::move(external_declaration_node));
+        }
+        // HANDLE ERRORS
+        else {
+            ErrorInfo ei = getErrorInfo(external_declaration_node);
+            // could be function or declaration (global variable)
+            if (external_declaration_node->children.at(0)->type == Type::FUNCTION_DEFINITION) {
+                //Print("In Function")
+            } else if (external_declaration_node->children.at(0)->type == Type::DECLARATION) {
+                //Print("In declaration")
+            }
+        }
     }
 
     return self;
 }
 
+// EXTERNAL DECLARATION (FUNCTION OR GLOBAL VARIABLE)
 std::unique_ptr<Node> Parser::external_declaration()
 {
     std::unique_ptr<Node> self = std::make_unique<Node>();
@@ -63,6 +109,7 @@ std::unique_ptr<Node> Parser::external_declaration()
     return self;
 }
 
+// FUNCTION DEFINITION
 std::unique_ptr<Node> Parser::function_definition()
 {
     std::unique_ptr<Node> self = std::make_unique<Node>();
@@ -103,6 +150,8 @@ std::unique_ptr<Node> Parser::function_definition()
 
     return self;
 }
+
+// 
 std::unique_ptr<Node> Parser::declaration_specifier()
 {
     // TODO: talk to Zach about possibly altering declaration_specifier() grammar.
@@ -132,6 +181,8 @@ std::unique_ptr<Node> Parser::struct_declaration() {}
 std::unique_ptr<Node> Parser::specifier_qualifier() {}
 std::unique_ptr<Node> Parser::struct_declarator_list() {}
 std::unique_ptr<Node> Parser::struct_declarator() {}
+
+// 
 std::unique_ptr<Node> Parser::declarator()
 {
     std::unique_ptr<Node> self = std::make_unique<Node>();
@@ -218,7 +269,7 @@ std::unique_ptr<Node> Parser::primary_expression()
            if (nextToken.type != TokenType::CLOSE_PARENS) {
                right_parens->accepted = false;
                right_parens->data = nextToken.value;
-               self->children.push_back(right_parens);
+               self->children.push_back(std::move(right_parens));
                self->accepted = false;
             } else {
                 self->children.push_back(std::move(right_parens));
@@ -231,7 +282,7 @@ std::unique_ptr<Node> Parser::primary_expression()
        std::unique_ptr<Node> error_node = std::make_unique<Node>();
        error_node->type = Type::ERROR;
        error_node->data = nextToken.value;
-       self->children.push_back(error_node);
+       self->children.push_back(std::move(error_node));
        self->accepted = false;
    }
 
@@ -335,7 +386,7 @@ std::unique_ptr<Node> Parser::assignment_operator()
         assignment_node->accepted = true;
         assignment_node->type = Type::UNARY_ASSIGNMENT;
         assignment_node->data = tok.value;
-        self->children.push_back(assignment_node);
+        self->children.push_back(std::move(assignment_node));
     } else if (tok.type == TokenType::STAR_EQUAL) {
         // *=
         std::unique_ptr<Node> assign_multiply_result_node = std::make_unique<Node>();
@@ -410,7 +461,7 @@ std::unique_ptr<Node> Parser::assignment_operator()
         std::unique_ptr<Node> error_node = std::make_unique<Node>();
         error_node->type = Type::ERROR;
         error_node->data = tok.value;
-        self->children.push_back(error_node);
+        self->children.push_back(std::move(error_node));
         self->accepted = false;
     }
 
@@ -464,7 +515,7 @@ std::unique_ptr<Node> Parser::unary_operator()
         std::unique_ptr<Node> error_node = std::make_unique<Node>();
         error_node->type = Type::ERROR;
         error_node->data = tok.value;
-        self->children.push_back(error_node);
+        self->children.push_back(std::move(error_node));
         self->accepted = false;
     }
 
@@ -534,7 +585,7 @@ std::unique_ptr<Node> Parser::jump_statement()
         std::unique_ptr<Node> error_node = std::make_unique<Node>();
         error_node->type = Type::ERROR;
         error_node->data = tok.value;
-        self->children.push_back(error_node);
+        self->children.push_back(std::move(error_node));
         self->accepted = false;
     }
 
