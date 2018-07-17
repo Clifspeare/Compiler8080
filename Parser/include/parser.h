@@ -93,11 +93,6 @@ private:
     int m_tokenIndex = 0;
     std::vector<Token> m_tokens;
 
-    // error-handling
-    void reportError(const std::string& errorString);
-    void showErrors();
-
-
     // Recursive-descent non-terminal parsing routines
     std::unique_ptr<Node> translation_unit();
     std::unique_ptr<Node> Parser::external_declaration();
@@ -156,10 +151,6 @@ private:
     std::unique_ptr<Node> selection_statement();
     std::unique_ptr<Node> iteration_statement();
     std::unique_ptr<Node> jump_statement();
-
-    bool CheckToken(std::vector<TokenType> tokenList);
-    bool CheckTokenPair(TokenType token1, TokenType token2);
-
 };
 
 #endif

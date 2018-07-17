@@ -22,18 +22,6 @@ bool Parser::BuildTree() {
     m_root = translation_unit();
 }
 
-void Parser::reportError(const std::string& errorString)
-{
-    m_errors.push_back(errorString);
-}
-
-void Parser::showErrors()
-{
-    for (auto string : m_errors) {
-        std::cout << string << std::endl;
-    }
-}
-
 std::unique_ptr<Node> Parser::translation_unit()
 {
     std::unique_ptr<Node> self = std::make_unique<Node>();
@@ -538,9 +526,4 @@ std::unique_ptr<Node> Parser::jump_statement()
     }
 
     return self;
-}
-
-bool Parser::CheckTokenPair(TokenType token1, TokenType token2) {
-    // TODO: Do the buffer thing.
-    return true;
 }
