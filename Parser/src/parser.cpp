@@ -33,30 +33,34 @@ std::unique_ptr<Node> Parser::translation_unit()
         self->children.push_back(std::move(external_declaration_node));
         external_declaration_node = external_declaration();
     }
+
+    return self;
 }
 
 std::unique_ptr<Node> Parser::external_declaration()
 {
     std::unique_ptr<Node> self = std::make_unique<Node>();
+    std::unique_ptr<Node> function_definition_node;
+    std::unique_ptr<Node> declaration_node;
 
-    std::unique_ptr<Node> function_definition_node = function_definition();
-    std::unique_ptr<Node> declaration_node = declaration();
+    int saved_token_index = m_tokenIndex;
 
-    // int count = 0;
-    // while (true) {
-    //     // CHECK FOR GLOBAL VARIABLES OR FUNCTIONS
-    //     if (function_definition(child) || declaration(child)) {
-    //         node->type = Type::EXTERNAL_DECLARATION;
-    //         node->children.push_back(std::move(child));
-    //         ++count;
-    //     } else {
-    //         if (count == 0)
-    //             return false;
-    //         else
-    //             return true;
-    //     }
-    //     child = std::make_unique<Node>();
-    // }
+    function_definition_node = function_definition();
+    if (function_definition_node->accepted) {
+        self->accepted = true;
+        self->children.push_back(std::move(function_definition_node));
+    } else {
+        m_tokenIndex = saved_token_index;
+        declaration_node = declaration();
+        if (declaration_node->accepted) {
+            self->accepted = true;
+            self->children.push_back(std::move(declaration_node));
+        } else {
+            // Show error for function_definition_node or declaration_node
+        }
+    }
+
+    return self;
 }
 
 std::unique_ptr<Node> Parser::function_definition()
