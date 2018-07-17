@@ -34,6 +34,10 @@ enum class Type
     MULTIPLICATION,
     POINTER_OP,
     BITWISE_NOT,
+    GOTO,
+    CONTINUE,
+    BREAK,
+    STATEMENT_END,
 
 
     IDENTIFIER,
@@ -41,6 +45,8 @@ enum class Type
     STRING,
 
     COMMA,
+    LEFT_PARENTHESIS,
+    RIGHT_PARENTHESIS,
     UNARY_ASSIGNMENT,
     UNARY_AND,
     UNARY_POSITIVE,

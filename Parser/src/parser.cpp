@@ -101,7 +101,7 @@ std::unique_ptr<Node> Parser::function_definition()
 
     node->children.push_back(std::move(child));
 }
-bool Parser::declaration_specifier(std::unique_ptr<Node>& node)
+std::unique_ptr<Node> Parser::declaration_specifier()
 {
     std::unique_ptr<Node> child = std::make_unique<Node>();
     if (storage_class_specifier(child) || type_specifier(child) || type_qualifier(child)) {
@@ -110,23 +110,23 @@ bool Parser::declaration_specifier(std::unique_ptr<Node>& node)
     }
     return false;
 }
-bool Parser::storage_class_specifier(std::unique_ptr<Node>& node)
+std::unique_ptr<Node> Parser::storage_class_specifier()
 {
     if (CheckToken(std::vector<TokenType>({TokenType::AUTO, TokenType::REGISTER, TokenType::STATIC, TokenType::EXTERN, TokenType::TYPEDEF}))) {
         // child node of storage_class_specifier OR *value* of storage_class_specifier
     }
 }
-bool Parser::type_specifier(std::unique_ptr<Node>& node)
+std::unique_ptr<Node> Parser::type_specifier()
 {
     
 }
-bool Parser::struct_or_union_specifer(std::unique_ptr<Node>& node) {}
-bool Parser::struct_or_union(std::unique_ptr<Node>& node) {}
-bool Parser::struct_declaration(std::unique_ptr<Node>& node) {}
-bool Parser::specifier_qualifier(std::unique_ptr<Node>& node) {}
-bool Parser::struct_declarator_list(std::unique_ptr<Node>& node) {}
-bool Parser::struct_declarator(std::unique_ptr<Node>& node) {}
-bool Parser::declarator(std::unique_ptr<Node>& node)
+std::unique_ptr<Node> Parser::struct_or_union_specifer() {}
+std::unique_ptr<Node> Parser::struct_or_union() {}
+std::unique_ptr<Node> Parser::struct_declaration() {}
+std::unique_ptr<Node> Parser::specifier_qualifier() {}
+std::unique_ptr<Node> Parser::struct_declarator_list() {}
+std::unique_ptr<Node> Parser::struct_declarator() {}
+std::unique_ptr<Node> Parser::declarator()
 {
     std::unique_ptr<Node> child = std::make_unique<Node>();
     pointer(child); // zero or one
@@ -137,25 +137,25 @@ bool Parser::declarator(std::unique_ptr<Node>& node)
     node->type = Type::DECLARATOR;
     node->children.push_back(std::move(child));
 }
-bool Parser::pointer(std::unique_ptr<Node>& node)
+std::unique_ptr<Node> Parser::pointer()
 {
     
 }
-bool Parser::type_qualifier(std::unique_ptr<Node>& node) {}
-bool Parser::direct_declarator(std::unique_ptr<Node>& node) {}
-bool Parser::constant_expression(std::unique_ptr<Node>& node) {}
-bool Parser::logical_or_expression(std::unique_ptr<Node>& node) {}
-bool Parser::logical_and_expression(std::unique_ptr<Node>& node) {}
-bool Parser::inclusive_or_expression(std::unique_ptr<Node>& node) {}
-bool Parser::and_expression(std::unique_ptr<Node>& node) {}
-bool Parser::equality_expression(std::unique_ptr<Node>& node) {}
-bool Parser::relational_expression(std::unique_ptr<Node>& node) {}
-bool Parser::shift_expression(std::unique_ptr<Node>& node) {}
-bool Parser::additive_expression(std::unique_ptr<Node>& node) {}
-bool Parser::multiplicative_expression(std::unique_ptr<Node>& node) {}
-bool Parser::cast_expression(std::unique_ptr<Node>& node) {}
-bool Parser::unary_expression(std::unique_ptr<Node>& node) {}
-bool Parser::postfix_expression(std::unique_ptr<Node>& node) {}
+std::unique_ptr<Node> Parser::type_qualifier() {}
+std::unique_ptr<Node> Parser::direct_declarator() {}
+std::unique_ptr<Node> Parser::constant_expression() {}
+std::unique_ptr<Node> Parser::logical_or_expression() {}
+std::unique_ptr<Node> Parser::logical_and_expression() {}
+std::unique_ptr<Node> Parser::inclusive_or_expression() {}
+std::unique_ptr<Node> Parser::and_expression() {}
+std::unique_ptr<Node> Parser::equality_expression() {}
+std::unique_ptr<Node> Parser::relational_expression() {}
+std::unique_ptr<Node> Parser::shift_expression() {}
+std::unique_ptr<Node> Parser::additive_expression() {}
+std::unique_ptr<Node> Parser::multiplicative_expression() {}
+std::unique_ptr<Node> Parser::cast_expression() {}
+std::unique_ptr<Node> Parser::unary_expression() {}
+std::unique_ptr<Node> Parser::postfix_expression() {}
 std::unique_ptr<Node> Parser::primary_expression()
 {
     /*
@@ -194,18 +194,21 @@ std::unique_ptr<Node> Parser::primary_expression()
        std::unique_ptr<Node> right_parens = std::make_unique<Node>();
 
        left_parens->accepted = true;
+       left_parens->type = Type::LEFT_PARENTHESIS;
+       right_parens->type = Type::RIGHT_PARENTHESIS;
+
        self->children.push_back(std::move(left_parens));
        self->children.push_back(std::move(expression_node));
+
        if (!expression_node->accepted) {
            self->accepted = false;
        } else {
            nextToken = getNextToken();
            if (nextToken.type != TokenType::CLOSE_PARENS) {
+               right_parens->accepted = false;
+               right_parens->data = nextToken.value;
+               self->children.push_back(right_parens);
                self->accepted = false;
-               std::unique_ptr<Node> error_node = std::make_unique<Node>();
-               error_node->type = Type::ERROR;
-               error_node->data = nextToken.value;
-               self->children.push_back(error_node);
             } else {
                 self->children.push_back(std::move(right_parens));
                 self->accepted = true;
@@ -454,34 +457,87 @@ std::unique_ptr<Node> Parser::unary_operator()
 
     return self;
 }
-bool Parser::type_name(std::unique_ptr<Node>& node) {}
-bool Parser::parameter_type_list(std::unique_ptr<Node>& node) {}
-bool Parser::parameter_list(std::unique_ptr<Node>& node) {}
-bool Parser::parameter_declaration(std::unique_ptr<Node>& node) {}
-bool Parser::abstract_declarator(std::unique_ptr<Node>& node) {}
-bool Parser::direct_abstract_declarator(std::unique_ptr<Node>& node) {}
-bool Parser::enum_specifer(std::unique_ptr<Node>& node) {}
-bool Parser::enumerator_list(std::unique_ptr<Node>& node) {}
-bool Parser::enumerator(std::unique_ptr<Node>& node) {}
-bool Parser::typedef_name(std::unique_ptr<Node>& node) {}
+std::unique_ptr<Node> Parser::type_name() {}
+std::unique_ptr<Node> Parser::parameter_type_list() {}
+std::unique_ptr<Node> Parser::parameter_list() {}
+std::unique_ptr<Node> Parser::parameter_declaration() {}
+std::unique_ptr<Node> Parser::abstract_declarator() {}
+std::unique_ptr<Node> Parser::direct_abstract_declarator() {}
+std::unique_ptr<Node> Parser::enum_specifer() {}
+std::unique_ptr<Node> Parser::enumerator_list() {}
+std::unique_ptr<Node> Parser::enumerator() {}
+std::unique_ptr<Node> Parser::typedef_name() {}
 std::unique_ptr<Node> Parser::declaration() {}
-bool Parser::init_declarator(std::unique_ptr<Node>& node) {}
-bool Parser::initializer(std::unique_ptr<Node>& node) {}
-bool Parser::initializer_list(std::unique_ptr<Node>& node) {}
-bool Parser::compound_statement(std::unique_ptr<Node>& node) {}
-bool Parser::statement(std::unique_ptr<Node>& node) {}
-bool Parser::labeled_statement(std::unique_ptr<Node>& node) {}
-bool Parser::expression_statement(std::unique_ptr<Node>& node) {}
-bool Parser::selection_statement(std::unique_ptr<Node>& node) {}
-bool Parser::iteration_statement(std::unique_ptr<Node>& node) {}
+std::unique_ptr<Node> Parser::init_declarator() {}
+std::unique_ptr<Node> Parser::initializer() {}
+std::unique_ptr<Node> Parser::initializer_list() {}
+std::unique_ptr<Node> Parser::compound_statement() {}
+std::unique_ptr<Node> Parser::statement() {}
+std::unique_ptr<Node> Parser::labeled_statement() {}
+std::unique_ptr<Node> Parser::expression_statement() {}
+std::unique_ptr<Node> Parser::selection_statement() {}
+std::unique_ptr<Node> Parser::iteration_statement() {}
 
-bool Parser::jump_statement(std::unique_ptr<Node>& node)
+
+// TODO: test this.  I did it weird. (iterative instead of recursive to wrap my head around left-refactoring)
+std::unique_ptr<Node> Parser::jump_statement()
 {
-    node->type = Type::JUMP_STATEMENT;
-    if(CheckTokenPair(TokenType::GOTO,TokenType::ID)) {
+    std::unique_ptr<Node> self = std::make_unique<Node>();
+    self->type = Type::JUMP_STATEMENT;
 
-        return true;
+    Token tok = getNextToken();
+
+    if (tok.type == TokenType::GOTO) {
+        std::unique_ptr<Node> goto_node = std::make_unique<Node>();
+        goto_node->accepted = true;
+        goto_node->type = Type::GOTO;
+        goto_node->data = tok.value;
+        self->children.push_back(std::move(goto_node));
+
+        tok = getNextToken();
+        if (tok.type == TokenType::ID) {
+            std::unique_ptr<Node> goto_label = std::make_unique<Node>();
+            goto_label->accepted = true;
+            goto_node->type = Type::GOTO;
+            goto_node->data = tok.value;
+
+            self->children.push_back(std::move(goto_label));
+        } else {
+            self->accepted = false;
+        }
+    } else if (tok.type == TokenType::CONTINUE) {
+        std::unique_ptr<Node> continue_node = std::make_unique<Node>();
+        continue_node->accepted = true;
+        continue_node->type = Type::CONTINUE;
+        continue_node->data = tok.value;
+        self->children.push_back(std::move(continue_node));
+    } else if (tok.type == TokenType::BREAK) {
+        std::unique_ptr<Node> break_node = std::make_unique<Node>();
+        break_node->accepted = true;
+        break_node->type = Type::BREAK;
+        break_node->data = tok.value;
+        self->children.push_back(std::move(break_node));
+    } else {
+        std::unique_ptr<Node> error_node = std::make_unique<Node>();
+        error_node->type = Type::ERROR;
+        error_node->data = tok.value;
+        self->children.push_back(error_node);
+        self->accepted = false;
     }
+
+    // Next input should be semi-colon, for all possible productions
+    tok = getNextToken();
+    if (tok.type == TokenType::SEMICOLON) {
+        std::unique_ptr<Node> semicolon_node = std::make_unique<Node>();
+        semicolon_node->accepted = true;
+        semicolon_node->type = Type::STATEMENT_END;
+        semicolon_node->data = tok.value;
+        self->children.push_back(std::move(semicolon_node));
+    } else {
+        self->accepted = false;
+    }
+
+    return self;
 }
 
 bool Parser::CheckTokenPair(TokenType token1, TokenType token2) {
