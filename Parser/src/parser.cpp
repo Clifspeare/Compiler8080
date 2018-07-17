@@ -68,34 +68,59 @@ std::unique_ptr<Node> Parser::function_definition()
     std::unique_ptr<Node> self = std::make_unique<Node>();
     self->type = Type::FUNCTION_DEFINITION;
 
-    // CHECK FOR RETURN VALUES - TODO: Handle special cases (int int, long long long, ect..)
-    std::unique_ptr<Node> declaration_specifier_node;
-    while (declaration_specifier(child));
-    // CHECK FOR FUNCTION NAME
-    if (!declarator(child))
-        return false;
-    // CHECK FOR PARAMETERS
-    while (declaration(child));
-    // CHECK FOR FUNCTION BODY
-    if (!compound_statement(child))
-        return false;
+    // CHECK FOR RETURN TYPE - TODO: Handle special cases (int int, long long long, ect..)
+    int saved_token_index = m_tokenIndex;
+    std::unique_ptr<Node> declaration_specifier_node = declaration_specifier();
+    while (declaration_specifier_node->accepted) {
+        saved_token_index = m_tokenIndex;
+        self->children.push_back(std::move(declaration_specifier_node));
+        declaration_specifier_node = declaration_specifier();
+    }
+    m_tokenIndex = saved_token_index;
 
-    node->children.push_back(std::move(child));
+    // CHECK FOR FUNCTION NAME
+    std::unique_ptr<Node> declarator_node = declarator();
+    if (!declarator_node->accepted) {
+        self->accepted = false;
+    }
+    self->children.push_back(std::move(declarator_node));
+
+    saved_token_index = m_tokenIndex;
+    std::unique_ptr<Node> declaration_node = declaration();
+    while (declaration_node->accepted) {
+        saved_token_index = m_tokenIndex;
+        self->children.push_back(std::move(declaration_node));
+        declaration_node = declaration();
+    }
+    m_tokenIndex = saved_token_index;
+
+    // CHECK FOR FUNCTION BODY
+    std::unique_ptr<Node> compound_statement_node = compound_statement();
+    if (!compound_statement_node->accepted) {
+        self->accepted = false;
+    }
+    self->children.push_back(std::move(compound_statement_node));
+
+    return self;
 }
 std::unique_ptr<Node> Parser::declaration_specifier()
 {
-    std::unique_ptr<Node> child = std::make_unique<Node>();
-    if (storage_class_specifier(child) || type_specifier(child) || type_qualifier(child)) {
-        node->type = Type::DECLARATION_SPECIFIER;
-        node->children.push_back(std::move(child));
-    }
-    return false;
+    // TODO: talk to Zach about possibly altering declaration_specifier() grammar.
+
+    // std::unique_ptr<Node> self = std::make_unique<Node>();
+    // self->type = Type::DECLARATION_SPECIFIER;
+
+    // std::unique_ptr<Node> storage_class_specifier_node;
+    // std::unique_ptr<Node> type_specifier_node;
+    // std::unique_ptr<Node> type_qualifier_node;
+
+    // int saved_token_index = m_tokenIndex;
+    // storage_class_specifier_node
+
+    // return self;
 }
 std::unique_ptr<Node> Parser::storage_class_specifier()
 {
-    if (CheckToken(std::vector<TokenType>({TokenType::AUTO, TokenType::REGISTER, TokenType::STATIC, TokenType::EXTERN, TokenType::TYPEDEF}))) {
-        // child node of storage_class_specifier OR *value* of storage_class_specifier
-    }
 }
 std::unique_ptr<Node> Parser::type_specifier()
 {
@@ -178,9 +203,6 @@ std::unique_ptr<Node> Parser::primary_expression()
        left_parens->type = Type::LEFT_PARENTHESIS;
        right_parens->type = Type::RIGHT_PARENTHESIS;
 
-       self->children.push_back(std::move(left_parens));
-       self->children.push_back(std::move(expression_node));
-
        if (!expression_node->accepted) {
            self->accepted = false;
        } else {
@@ -195,6 +217,8 @@ std::unique_ptr<Node> Parser::primary_expression()
                 self->accepted = true;
             }
        }
+       self->children.push_back(std::move(left_parens));
+       self->children.push_back(std::move(expression_node));
    } else {
        std::unique_ptr<Node> error_node = std::make_unique<Node>();
        error_node->type = Type::ERROR;
