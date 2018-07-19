@@ -27,7 +27,7 @@ public:
 
 private:
     Preprocessor m_preprocessor;
-    std::unique_ptr<Node> m_root;
+    std::shared_ptr<Node> m_root;
     std::vector<std::string> m_errors;
 
     // TODO: make this better.
