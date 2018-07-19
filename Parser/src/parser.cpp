@@ -470,7 +470,7 @@ std::shared_ptr<Node> Parser::unary_operator() {
     unary_positive_node->accepted = true;
     unary_positive_node->type = Type::UNARY_POSITIVE;
     unary_positive_node->data = tok.value;
-        self->addChild((unary_positive_node);
+        self->addChild((unary_positive_node));
   } else if (tok.type == TokenType::MINUS) {
     std::shared_ptr<Node> unary_negative_node = std::make_shared<Node>();
     unary_negative_node->accepted = true;
