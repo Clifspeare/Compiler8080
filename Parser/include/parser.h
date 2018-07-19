@@ -2,38 +2,35 @@
 #define PARSER_H
 
 #include "Preprocessor.h"
-#include "token_types.h"
 #include "ast_type.h"
 #include "node.h"
+#include "token_types.h"
 
 template <class T>
 class SymbolEntry {
-public:
-    SymbolEntry(T new_symbol){
-        symbol_m = new_symbol;
-    }
-    
-    std::string identifier_name_m;
-    T symbol_m;
-    SymbolEntry* next_m;
+ public:
+  SymbolEntry(T new_symbol) { symbol_m = new_symbol; }
+
+  std::string identifier_name_m;
+  T symbol_m;
+  SymbolEntry* next_m;
 };
 
 class Parser {
-public:
-    Parser();
-    bool BuildTree();
+ public:
+  Parser();
 
-    bool HasTokens();
+  bool HasTokens();
 
-private:
-    Preprocessor m_preprocessor;
-    std::shared_ptr<Node> m_root;
-    std::vector<std::string> m_errors;
+ private:
+  Preprocessor m_preprocessor;
+  std::shared_ptr<Node> m_root;
+  std::vector<std::string> m_errors;
 
-    // TODO: make this better.
-    Token getNextToken();
-    int m_tokenIndex = 0;
-    std::vector<Token> m_tokens;
+  // TODO: make this better.
+  Token getNextToken();
+  int m_tokenIndex = 0;
+  std::vector<Token> m_tokens;
 
     // Recursive-descent non-terminal parsing routines
     std::shared_ptr<Node> translation_unit();

@@ -4,30 +4,30 @@
 
 #ifndef COMPILER8080_PREPROCESSOR_H
 #define COMPILER8080_PREPROCESSOR_H
-#include "Scanner.h"
 #include <algorithm>
+#include "Scanner.h"
 
 struct Definition {
-    std::string definition;
-    Token token;
+  std::string definition;
+  Token token;
 };
 
 class Preprocessor {
-public:
-    Preprocessor();
-    Preprocessor(char* filepath);
-    Preprocessor(Scanner existingScanner);
+ public:
+  Preprocessor();
+  Preprocessor(char* filepath);
+  Preprocessor(Scanner existingScanner);
 
-    Token getNextToken();
-private:
-    void addDefinition(Token definition, Token value);
-    bool hasDefinition(Token token);
-    Token getDefinitionReplacement(std::string idStringToBeReplaced);
+  Token getNextToken();
 
-    Scanner m_scanner;
+ private:
+  void addDefinition(Token definition, Token value);
+  bool hasDefinition(Token token);
+  Token getDefinitionReplacement(std::string idStringToBeReplaced);
 
-    std::vector<Definition> m_defines;
+  Scanner m_scanner;
+
+  std::vector<Definition> m_defines;
 };
 
-
-#endif //COMPILER8080_PREPROCESSOR_H
+#endif  // COMPILER8080_PREPROCESSOR_H

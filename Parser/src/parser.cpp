@@ -28,10 +28,6 @@ Token Parser::getNextToken()
     return t;
 }
 
-bool Parser::BuildTree() {
-    m_root = translation_unit();
-}
-
 struct ErrorInfo {
     Type expected_type;
     std::string actual_value;
@@ -53,6 +49,12 @@ ErrorInfo getErrorInfo(std::shared_ptr<Node>& node)
     }
 }
 
+// PRINT DEBUG
+void PrintErrorMessage(ErrorInfo info, Type enclosing_type)
+{
+    
+}
+
 // FILE(S) ENTRY POINT
 std::shared_ptr<Node> Parser::translation_unit()
 {
@@ -67,15 +69,9 @@ std::shared_ptr<Node> Parser::translation_unit()
         if(external_declaration_node->accepted) {
             self->addChild((external_declaration_node));
         }
-        // HANDLE ERRORS
         else {
-            ErrorInfo ei = getErrorInfo(external_declaration_node);
-            // could be function or declaration (global variable)
-            if (external_declaration_node->children.at(0)->type == Type::FUNCTION_DEFINITION) {
-                //Print("In Function")
-            } else if (external_declaration_node->children.at(0)->type == Type::DECLARATION) {
-                //Print("In declaration")
-            }
+            // HANDLE ERRORS
+            PrintErrorMessage(getErrorInfo(external_declaration_node),external_declaration_node->children.at(0)->type);
         }
     }
 
