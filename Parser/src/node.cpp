@@ -6,5 +6,5 @@ void Node::addChild(std::unique_ptr<Node> node)
     if (node->accepted == false) {
         this->accepted = false;
     }
-    this->children.push_back(std::move(node));
+    this->children.push_back(node);
 }
