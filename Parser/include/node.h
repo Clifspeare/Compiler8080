@@ -15,5 +15,5 @@ public:
     Type type;
     Node* parent;
     std::vector<std::unique_ptr<Node>> children;
-    bool accepted;
+    bool accepted = true;
 };
