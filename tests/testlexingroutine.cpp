@@ -21,7 +21,6 @@ int main(int argc, char *argv[]) {
     Scanner lexer(filepath, doRawLog);
     Preprocessor preprocessor(lexer);
     Token token;
-    int counter = 0;
     token = preprocessor.getNextToken();
     while (token.value != "end") {
         if (print)

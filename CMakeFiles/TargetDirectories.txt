@@ -1,0 +1,4 @@
+C:/Projects/Compiler8080/CMakeFiles/Lexer.dir
+C:/Projects/Compiler8080/CMakeFiles/TestLexingRoutine.dir
+C:/Projects/Compiler8080/CMakeFiles/edit_cache.dir
+C:/Projects/Compiler8080/CMakeFiles/rebuild_cache.dir

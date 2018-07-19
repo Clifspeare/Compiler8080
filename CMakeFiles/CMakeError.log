@@ -1,0 +1,750 @@
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/Program Files/LLVM/bin/clang-cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang-cl.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang-cl.exe: error: unable to execute command: program not executable
+clang-cl.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files/LLVM/bin/clang-cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang-cl.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang-cl.exe: error: unable to execute command: program not executable
+clang-cl.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_86d09"
+[1/2] Building C object CMakeFiles\cmTC_86d09.dir\CMakeCCompilerABI.c.obj
+[2/2] Linking C executable cmTC_86d09.exe
+FAILED: cmTC_86d09.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_86d09.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_86d09.dir\CMakeCCompilerABI.c.obj  /out:cmTC_86d09.exe /implib:cmTC_86d09.lib /pdb:cmTC_86d09.pdb /version:0.0  /machine:x64  /debug /INCREMENTAL /subsystem:console   && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_86d09.dir/manifest.res CMakeFiles\cmTC_86d09.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting C [] compiler features failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_216c5"
+[1/2] Building C object CMakeFiles\cmTC_216c5.dir\feature_tests.c.obj
+[2/2] Linking C executable cmTC_216c5.exe
+FAILED: cmTC_216c5.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_216c5.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_216c5.dir\feature_tests.c.obj  /out:cmTC_216c5.exe /implib:cmTC_216c5.lib /pdb:cmTC_216c5.pdb /version:0.0  /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_216c5.dir/manifest.res CMakeFiles\cmTC_216c5.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_0eefe"
+[1/2] Building CXX object CMakeFiles\cmTC_0eefe.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_0eefe.exe
+FAILED: cmTC_0eefe.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_0eefe.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_0eefe.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_0eefe.exe /implib:cmTC_0eefe.lib /pdb:cmTC_0eefe.pdb /version:0.0  /machine:x64  /debug /INCREMENTAL /subsystem:console   && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_0eefe.dir/manifest.res CMakeFiles\cmTC_0eefe.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting CXX [] compiler features failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_bcdda"
+[1/2] Building CXX object CMakeFiles\cmTC_bcdda.dir\feature_tests.cxx.obj
+[2/2] Linking CXX executable cmTC_bcdda.exe
+FAILED: cmTC_bcdda.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_bcdda.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_bcdda.dir\feature_tests.cxx.obj  /out:cmTC_bcdda.exe /implib:cmTC_bcdda.lib /pdb:cmTC_bcdda.pdb /version:0.0  /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_bcdda.dir/manifest.res CMakeFiles\cmTC_bcdda.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+1
+
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+gcc.exe: fatal error: no input files
+compilation terminated.
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+gcc.exe: fatal error: no input files
+compilation terminated.
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--c++'
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--ec++'; did you mean '-Weffc++'?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--c++'
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--ec++'; did you mean '-Weffc++'?
+
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+g++.exe: fatal error: no input files
+compilation terminated.
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+g++.exe: fatal error: no input files
+compilation terminated.
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_a5317"
+[1/2] Building C object CMakeFiles\cmTC_a5317.dir\CMakeCCompilerABI.c.obj
+FAILED: CMakeFiles/cmTC_a5317.dir/CMakeCCompilerABI.c.obj 
+C:\MinGW\bin\gcc.exe    -o CMakeFiles\cmTC_a5317.dir\CMakeCCompilerABI.c.obj   -c "C:\Program Files\CMake\share\cmake-3.11\Modules\CMakeCCompilerABI.c"
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_1cef2"
+[1/2] Building CXX object CMakeFiles\cmTC_1cef2.dir\CMakeCXXCompilerABI.cpp.obj
+FAILED: CMakeFiles/cmTC_1cef2.dir/CMakeCXXCompilerABI.cpp.obj 
+C:\MinGW\bin\g++.exe     -o CMakeFiles\cmTC_1cef2.dir\CMakeCXXCompilerABI.cpp.obj -c "C:\Program Files\CMake\share\cmake-3.11\Modules\CMakeCXXCompilerABI.cpp"
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/Program Files (x86)/LLVM/bin/clang-cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang-cl.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang-cl.exe: error: unable to execute command: program not executable
+clang-cl.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/LLVM/bin/clang++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang++.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang++.exe: error: unable to execute command: program not executable
+clang++.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/Program Files (x86)/LLVM/bin/clang-cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang-cl.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang-cl.exe: error: unable to execute command: program not executable
+clang-cl.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/LLVM/bin/clang++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang++.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang++.exe: error: unable to execute command: program not executable
+clang++.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/Program Files (x86)/LLVM/bin/clang-cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang-cl.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang-cl.exe: error: unable to execute command: program not executable
+clang-cl.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/LLVM/bin/clang-cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+clang-cl.exe: warning: unable to find a Visual Studio installation; try running Clang from a developer command prompt [-Wmsvc-not-found]
+clang-cl.exe: error: unable to execute command: program not executable
+clang-cl.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_72f38"
+[1/2] Building C object CMakeFiles\cmTC_72f38.dir\CMakeCCompilerABI.c.obj
+[2/2] Linking C executable cmTC_72f38.exe
+FAILED: cmTC_72f38.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_72f38.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_72f38.dir\CMakeCCompilerABI.c.obj  /out:cmTC_72f38.exe /implib:cmTC_72f38.lib /pdb:cmTC_72f38.pdb /version:0.0  /machine:X86  /debug /INCREMENTAL /subsystem:console   && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_72f38.dir/manifest.res CMakeFiles\cmTC_72f38.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting C [] compiler features failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_bc70e"
+[1/2] Building C object CMakeFiles\cmTC_bc70e.dir\feature_tests.c.obj
+[2/2] Linking C executable cmTC_bc70e.exe
+FAILED: cmTC_bc70e.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_bc70e.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_bc70e.dir\feature_tests.c.obj  /out:cmTC_bc70e.exe /implib:cmTC_bc70e.lib /pdb:cmTC_bc70e.pdb /version:0.0  /machine:X86  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_bc70e.dir/manifest.res CMakeFiles\cmTC_bc70e.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_446e3"
+[1/2] Building CXX object CMakeFiles\cmTC_446e3.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_446e3.exe
+FAILED: cmTC_446e3.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_446e3.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_446e3.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_446e3.exe /implib:cmTC_446e3.lib /pdb:cmTC_446e3.pdb /version:0.0  /machine:X86  /debug /INCREMENTAL /subsystem:console   && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_446e3.dir/manifest.res CMakeFiles\cmTC_446e3.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting CXX [] compiler features failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_dcf8f"
+[1/2] Building CXX object CMakeFiles\cmTC_dcf8f.dir\feature_tests.cxx.obj
+[2/2] Linking CXX executable cmTC_dcf8f.exe
+FAILED: cmTC_dcf8f.exe 
+cmd.exe /C "cd . && "C:\Program Files\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_dcf8f.dir --manifests  -- CMAKE_LINKER-NOTFOUND /nologo CMakeFiles\cmTC_dcf8f.dir\feature_tests.cxx.obj  /out:cmTC_dcf8f.exe /implib:cmTC_dcf8f.lib /pdb:cmTC_dcf8f.pdb /version:0.0  /machine:X86  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /foCMakeFiles\cmTC_dcf8f.dir/manifest.res CMakeFiles\cmTC_dcf8f.dir/manifest.rc" failed (exit code 0) with the following output:
+The system cannot find the file specified
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+1
+
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+gcc.exe: fatal error: no input files
+compilation terminated.
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+gcc.exe: fatal error: no input files
+compilation terminated.
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--c++'
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--ec++'; did you mean '-Weffc++'?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--c++'
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--ec++'; did you mean '-Weffc++'?
+
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+g++.exe: fatal error: no input files
+compilation terminated.
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+g++.exe: fatal error: no input files
+compilation terminated.
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_7870b"
+[1/2] Building C object CMakeFiles\cmTC_7870b.dir\CMakeCCompilerABI.c.obj
+FAILED: CMakeFiles/cmTC_7870b.dir/CMakeCCompilerABI.c.obj 
+C:\MinGW\bin\gcc.exe    -o CMakeFiles\cmTC_7870b.dir\CMakeCCompilerABI.c.obj   -c "C:\Program Files\CMake\share\cmake-3.11\Modules\CMakeCCompilerABI.c"
+ninja: build stopped: subcommand failed.
+
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/ProgramData/chocolatey/bin/ninja.exe" "cmTC_c2a47"
+[1/2] Building CXX object CMakeFiles\cmTC_c2a47.dir\CMakeCXXCompilerABI.cpp.obj
+FAILED: CMakeFiles/cmTC_c2a47.dir/CMakeCXXCompilerABI.cpp.obj 
+C:\MinGW\bin\g++.exe     -o CMakeFiles\cmTC_c2a47.dir\CMakeCXXCompilerABI.cpp.obj -c "C:\Program Files\CMake\share\cmake-3.11\Modules\CMakeCXXCompilerABI.cpp"
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -Aa 
+
+The output was:
+1
+
+
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: C:/MinGW/bin/gcc.exe 
+Build flags: 
+Id flags: -D__CLASSIC_C__ 
+
+The output was:
+1
+
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+gcc.exe: fatal error: no input files
+compilation terminated.
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+gcc.exe: fatal error: no input files
+compilation terminated.
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--c++'
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--ec++'; did you mean '-Weffc++'?
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: -c 
+
+The output was:
+1
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--c++'
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/MinGW/bin/g++.exe 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+1
+g++.exe: error: unrecognized command line option '--ec++'; did you mean '-Weffc++'?
+
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+g++.exe: fatal error: no input files
+compilation terminated.
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+g++.exe: fatal error: no input files
+compilation terminated.
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"nmake" "/NOLOGO" "cmTC_e9d5f\fast"
+The system cannot find the file specified
+Generator: execution of make failed. Make command was: "nmake" "/NOLOGO" "cmTC_e9d5f\fast"
+
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Projects/Compiler8080/CMakeFiles/CMakeTmp
+
+Run Build Command:"nmake" "/NOLOGO" "cmTC_5be9d\fast"
+The system cannot find the file specified
+Generator: execution of make failed. Make command was: "nmake" "/NOLOGO" "cmTC_5be9d\fast"
+
+
+

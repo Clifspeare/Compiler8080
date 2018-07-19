@@ -1,0 +1,2 @@
+C:\MinGW\bin\ar.exe qc Lexer.lib  CMakeFiles/Lexer.dir/Lexer/src/Scanner.cpp.obj CMakeFiles/Lexer.dir/Lexer/src/Preprocessor.cpp.obj CMakeFiles/Lexer.dir/Lexer/src/utility_functions.cpp.obj
+C:\MinGW\bin\ranlib.exe Lexer.lib
