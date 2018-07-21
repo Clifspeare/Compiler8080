@@ -32,6 +32,8 @@ class Parser {
   int m_tokenIndex = 0;
   std::vector<Token> m_tokens;
 
+  // TODO: add Type Registration for typedef
+
     // Recursive-descent non-terminal parsing routines
     std::shared_ptr<Node> translation_unit();
     std::shared_ptr<Node> external_declaration();

@@ -152,7 +152,45 @@ std::shared_ptr<Node> Parser::declaration_specifier() {
 
   // return self;
 }
-std::shared_ptr<Node> Parser::storage_class_specifier() {}
+std::shared_ptr<Node> Parser::storage_class_specifier() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::STORAGE_CLASS_SPECIFIER;
+
+  Token nextToken = getNextToken();
+  if (nextToken.type == TokenType::AUTO) {
+    std::shared_ptr<Node> auto_node = std::make_shared<Node>();
+    auto_node->type = Type::AUTO;
+    auto_node->accepted = true;
+    self->addChild(auto_node);
+  } else if (nextToken.type == TokenType::REGISTER) {
+    std::shared_ptr<Node> register_node = std::make_shared<Node>();
+    register_node->type = Type::REGISTER;
+    register_node->accepted = true;
+    self->addChild(register_node);
+  } else if (nextToken.type == TokenType::STATIC) {
+    std::shared_ptr<Node> static_node = std::make_shared<Node>();
+    static_node->type = Type::STATIC;
+    static_node->accepted = true;
+    self->addChild(static_node);
+  } else if (nextToken.type == TokenType::EXTERN) {
+    std::shared_ptr<Node> extern_node = std::make_shared<Node>();
+    extern_node->type = Type::EXTERN;
+    extern_node->accepted = true;
+    self->addChild(extern_node);
+  } else if (nextToken.type == TokenType::TYPEDEF) {
+    std::shared_ptr<Node> typedef_node = std::make_shared<Node>();
+    typedef_node->type = Type::TYPEDEF;
+    typedef_node->accepted = true;
+    self->addChild(typedef_node);
+  } else {
+    std::shared_ptr<Node> error_node = std::make_shared<Node>();
+    error_node->type = Type::ERROR;
+    error_node->accepted = false;
+    self->addChild(error_node);
+  }
+  return self;
+}
 std::shared_ptr<Node> Parser::type_specifier() {}
 std::shared_ptr<Node> Parser::struct_or_union_specifer() {}
 std::shared_ptr<Node> Parser::struct_or_union() {}
