@@ -31,9 +31,9 @@ struct ErrorInfo {
 };
 
 ErrorInfo getErrorInfo(std::shared_ptr<Node>& node) {
-  if (node->children.size() == 0) {
+  if (node->type == Type::ERROR) {
     ErrorInfo err_no;
-    err_no.expected_type = node->type;
+    err_no.expected_type = node->parent->type;
     err_no.actual_value = node->data;
     return err_no;
   }
