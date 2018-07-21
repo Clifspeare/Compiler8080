@@ -41,7 +41,7 @@ class Parser {
     std::shared_ptr<Node> declaration_specifier();
     std::shared_ptr<Node> storage_class_specifier();
     std::shared_ptr<Node> type_specifier();
-    std::shared_ptr<Node> struct_or_union_specifer();
+    std::shared_ptr<Node> struct_or_union_specifier();
     std::shared_ptr<Node> struct_or_union();
     std::shared_ptr<Node> struct_declaration();
     std::shared_ptr<Node> specifier_qualifier();

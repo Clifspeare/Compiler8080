@@ -187,12 +187,94 @@ std::shared_ptr<Node> Parser::storage_class_specifier()
     std::shared_ptr<Node> error_node = std::make_shared<Node>();
     error_node->type = Type::ERROR;
     error_node->accepted = false;
+    error_node->data = nextToken.value;
     self->addChild(error_node);
   }
   return self;
 }
-std::shared_ptr<Node> Parser::type_specifier() {}
-std::shared_ptr<Node> Parser::struct_or_union_specifer() {}
+std::shared_ptr<Node> Parser::type_specifier() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::TYPE_SPECIFIER;
+
+  int saved_token_index = m_tokenIndex;
+  Token nextToken = getNextToken();
+  if (nextToken.type == TokenType::VOID) {
+    std::shared_ptr<Node> void_node = std::make_shared<Node>();
+    void_node->type = Type::VOID;
+    void_node->accepted = true;
+    self->addChild(void_node);
+  } else if (nextToken.type == TokenType::CHAR) {
+    std::shared_ptr<Node> char_node = std::make_shared<Node>();
+    char_node->type = Type::CHAR;
+    char_node->accepted = true;
+    self->addChild(char_node);
+  } else if (nextToken.type == TokenType::SHORT) {
+    std::shared_ptr<Node> short_node = std::make_shared<Node>();
+    short_node->type = Type::SHORT;
+    short_node->accepted = true;
+    self->addChild(short_node);
+  } else if (nextToken.type == TokenType::INT) {
+    std::shared_ptr<Node> int_node = std::make_shared<Node>();
+    int_node->type = Type::INT;
+    int_node->accepted = true;
+    self->addChild(int_node);
+  } else if (nextToken.type == TokenType::LONG) {
+    std::shared_ptr<Node> long_node = std::make_shared<Node>();
+    long_node->type = Type::LONG;
+    long_node->accepted = true;
+    self->addChild(long_node);
+  } else if (nextToken.type == TokenType::FLOAT) {
+    std::shared_ptr<Node> float_node = std::make_shared<Node>();
+    float_node->type = Type::FLOAT;
+    float_node->accepted = true;
+    self->addChild(float_node);
+  } else if (nextToken.type == TokenType::DOUBLE) {
+    std::shared_ptr<Node> double_node = std::make_shared<Node>();
+    double_node->type = Type::DOUBLE;
+    double_node->accepted = true;
+    self->addChild(double_node);
+  } else if (nextToken.type == TokenType::SIGNED) {
+    std::shared_ptr<Node> signed_node = std::make_shared<Node>();
+    signed_node->type = Type::SIGNED;
+    signed_node->accepted = true;
+    self->addChild(signed_node);
+  } else if (nextToken.type == TokenType::UNSIGNED) {
+    std::shared_ptr<Node> unsigned_node = std::make_shared<Node>();
+    unsigned_node->type = Type::UNSIGNED;
+    unsigned_node->accepted = true;
+    self->addChild(unsigned_node);
+  } else {
+    std::shared_ptr<Node> struct_or_union_specifier_node;
+    std::shared_ptr<Node> enum_specifier_node;
+    std::shared_ptr<Node> typedef_name_node;
+
+    struct_or_union_specifier_node = struct_or_union_specifier();
+    if (struct_or_union_specifier_node->accepted) {
+      self->addChild(struct_or_union_specifier_node);
+    } else {
+      m_tokenIndex = saved_token_index;
+      enum_specifier_node = enum_specifier();
+      if (enum_specifier_node->accepted) {
+        self->addChild(enum_specifier_node);
+      } else {
+        m_tokenIndex = saved_token_index;
+        typedef_name_node = typedef_name();
+        if (typedef_name_node->accepted) {
+          self->addChild(typedef_name_node);
+        } else {
+          m_tokenIndex = saved_token_index; // not strictly necessary, since it *should* be handled higher
+          std::shared_ptr<Node> error_node = std::make_shared<Node>();
+          error_node->type = Type::ERROR;
+          error_node->data = nextToken.value;
+          error_node->accepted = true;
+          self->addChild(error_node);
+        }
+      }
+    }
+  }
+}
+std::shared_ptr<Node> Parser::struct_or_union_specifier() {}
 std::shared_ptr<Node> Parser::struct_or_union() {}
 std::shared_ptr<Node> Parser::struct_declaration() {}
 std::shared_ptr<Node> Parser::specifier_qualifier() {}
@@ -543,7 +625,7 @@ std::shared_ptr<Node> Parser::parameter_list() {}
 std::shared_ptr<Node> Parser::parameter_declaration() {}
 std::shared_ptr<Node> Parser::abstract_declarator() {}
 std::shared_ptr<Node> Parser::direct_abstract_declarator() {}
-std::shared_ptr<Node> Parser::enum_specifer() {}
+std::shared_ptr<Node> Parser::enum_specifier() {}
 std::shared_ptr<Node> Parser::enumerator_list() {}
 std::shared_ptr<Node> Parser::enumerator() {}
 std::shared_ptr<Node> Parser::typedef_name() {}
