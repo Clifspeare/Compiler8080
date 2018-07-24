@@ -77,7 +77,7 @@ class Parser {
     std::shared_ptr<Node> parameter_declaration();
     std::shared_ptr<Node> abstract_declarator();
     std::shared_ptr<Node> direct_abstract_declarator();
-    std::shared_ptr<Node> enum_specifer();
+    std::shared_ptr<Node> enum_specifier();
     std::shared_ptr<Node> enumerator_list();
     std::shared_ptr<Node> enumerator();
     std::shared_ptr<Node> typedef_name();

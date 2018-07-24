@@ -619,7 +619,9 @@ std::shared_ptr<Node> Parser::unary_operator() {
 
   return self;
 }
-std::shared_ptr<Node> Parser::type_name() {}
+std::shared_ptr<Node> Parser::type_name() 
+{
+}
 std::shared_ptr<Node> Parser::parameter_type_list() {}
 std::shared_ptr<Node> Parser::parameter_list() {}
 std::shared_ptr<Node> Parser::parameter_declaration() {}
@@ -630,7 +632,28 @@ std::shared_ptr<Node> Parser::enumerator_list() {}
 std::shared_ptr<Node> Parser::enumerator() {}
 std::shared_ptr<Node> Parser::typedef_name() {}
 std::shared_ptr<Node> Parser::declaration() {}
-std::shared_ptr<Node> Parser::init_declarator() {}
+std::shared_ptr<Node> Parser::init_declarator() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+
+  std::shared_ptr<Node> declarator_node = declarator();
+  self->addChild(declarator_node);
+
+  int saved_token_index = m_tokenIndex;
+  Token nextToken = getNextToken();
+  if (declarator_node->accepted && nextToken.type == TokenType::EQUAL) {
+    std::shared_ptr<Node> assignment_op_node = std::make_shared<Node>();
+    self->addChild(assignment_op_node);
+    saved_token_index = m_tokenIndex;
+    
+    std::shared_ptr<Node> initializer_node = initializer();
+    self->addChild(initializer_node);
+  } else {
+    m_tokenIndex = saved_token_index;
+  }
+  
+  return self;
+}
 std::shared_ptr<Node> Parser::initializer() {}
 std::shared_ptr<Node> Parser::initializer_list() {}
 std::shared_ptr<Node> Parser::compound_statement() {}
