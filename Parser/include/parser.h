@@ -1,6 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <functional>
+
 #include "Preprocessor.h"
 #include "ast_type.h"
 #include "node.h"
@@ -33,23 +35,24 @@ class Parser {
   std::vector<Token> m_tokens;
 
   int computeTreeSize(std::shared_ptr<Node> node);
+  bool callNonterminalProcedure(std::shared_ptr<Node>(Parser::*fn)(), std::shared_ptr<Node> self, int tokenIndex);
 
   // TODO: add Type Registration for typedef
 
     // Recursive-descent non-terminal parsing routines
-    std::shared_ptr<Node> translation_unit();
-    std::shared_ptr<Node> external_declaration();
-    std::shared_ptr<Node> function_definition();
+    std::shared_ptr<Node> translation_unit(); //
+    std::shared_ptr<Node> external_declaration(); //
+    std::shared_ptr<Node> function_definition(); //
     std::shared_ptr<Node> declaration_specifier();
-    std::shared_ptr<Node> storage_class_specifier();
-    std::shared_ptr<Node> type_specifier();
+    std::shared_ptr<Node> storage_class_specifier(); //
+    std::shared_ptr<Node> type_specifier(); //
     std::shared_ptr<Node> struct_or_union_specifier();
     std::shared_ptr<Node> struct_or_union();
     std::shared_ptr<Node> struct_declaration();
     std::shared_ptr<Node> specifier_qualifier();
     std::shared_ptr<Node> struct_declarator_list();
     std::shared_ptr<Node> struct_declarator();
-    std::shared_ptr<Node> declarator();
+    std::shared_ptr<Node> declarator(); //
     std::shared_ptr<Node> pointer();
     std::shared_ptr<Node> type_qualifier();
     std::shared_ptr<Node> direct_declarator();

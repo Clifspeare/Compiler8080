@@ -46,7 +46,9 @@ ErrorInfo getErrorInfo(std::shared_ptr<Node>& node) {
 }
 
 // PRINT DEBUG
-void PrintErrorMessage(ErrorInfo info, Type enclosing_type) {}
+void PrintErrorMessage(ErrorInfo info, Type enclosing_type) {
+  std::cout << "ERROR! AAH!" << std::endl;
+}
 
 // FILE(S) ENTRY POINT
 std::shared_ptr<Node> Parser::translation_unit() {
@@ -152,8 +154,7 @@ std::shared_ptr<Node> Parser::declaration_specifier() {
 
   // return self;
 }
-std::shared_ptr<Node> Parser::storage_class_specifier() 
-{
+std::shared_ptr<Node> Parser::storage_class_specifier() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::STORAGE_CLASS_SPECIFIER;
 
@@ -192,8 +193,7 @@ std::shared_ptr<Node> Parser::storage_class_specifier()
   }
   return self;
 }
-std::shared_ptr<Node> Parser::type_specifier() 
-{
+std::shared_ptr<Node> Parser::type_specifier() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::TYPE_SPECIFIER;
 
@@ -263,7 +263,8 @@ std::shared_ptr<Node> Parser::type_specifier()
         if (typedef_name_node->accepted) {
           self->addChild(typedef_name_node);
         } else {
-          m_tokenIndex = saved_token_index; // not strictly necessary, since it *should* be handled higher
+          m_tokenIndex = saved_token_index;  // not strictly necessary, since it
+                                             // *should* be handled higher
           std::shared_ptr<Node> error_node = std::make_shared<Node>();
           error_node->type = Type::ERROR;
           error_node->data = nextToken.value;
@@ -590,7 +591,7 @@ std::shared_ptr<Node> Parser::unary_operator() {
     unary_positive_node->accepted = true;
     unary_positive_node->type = Type::UNARY_POSITIVE;
     unary_positive_node->data = tok.value;
-        self->addChild((unary_positive_node));
+    self->addChild((unary_positive_node));
   } else if (tok.type == TokenType::MINUS) {
     std::shared_ptr<Node> unary_negative_node = std::make_shared<Node>();
     unary_negative_node->accepted = true;
@@ -619,9 +620,7 @@ std::shared_ptr<Node> Parser::unary_operator() {
 
   return self;
 }
-std::shared_ptr<Node> Parser::type_name() 
-{
-}
+std::shared_ptr<Node> Parser::type_name() {}
 std::shared_ptr<Node> Parser::parameter_type_list() {}
 std::shared_ptr<Node> Parser::parameter_list() {}
 std::shared_ptr<Node> Parser::parameter_declaration() {}
@@ -632,8 +631,7 @@ std::shared_ptr<Node> Parser::enumerator_list() {}
 std::shared_ptr<Node> Parser::enumerator() {}
 std::shared_ptr<Node> Parser::typedef_name() {}
 std::shared_ptr<Node> Parser::declaration() {}
-std::shared_ptr<Node> Parser::init_declarator() 
-{
+std::shared_ptr<Node> Parser::init_declarator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
 
   std::shared_ptr<Node> declarator_node = declarator();
@@ -645,17 +643,16 @@ std::shared_ptr<Node> Parser::init_declarator()
     std::shared_ptr<Node> assignment_op_node = std::make_shared<Node>();
     self->addChild(assignment_op_node);
     saved_token_index = m_tokenIndex;
-    
+
     std::shared_ptr<Node> initializer_node = initializer();
     self->addChild(initializer_node);
   } else {
     m_tokenIndex = saved_token_index;
   }
-  
+
   return self;
 }
-std::shared_ptr<Node> Parser::initializer() 
-{
+std::shared_ptr<Node> Parser::initializer() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
 
   std::shared_ptr<Node> assignment_expression_node = assignment_expression();
@@ -667,10 +664,12 @@ std::shared_ptr<Node> Parser::initializer()
       self->addChild(initializer_list_node);
     } else {
       // TODO: implement
-      // This function (won't have to be used much) calculates how far a node has been able to parse
-      // It traverses the depth and breadth of a tree, stopping in each direction when it finds a terminal mismatch.
+      // This function (won't have to be used much) calculates how far a node
+      // has been able to parse It traverses the depth and breadth of a tree,
+      // stopping in each direction when it finds a terminal mismatch.
       // Technically i guess it could be a member method of Node...
-      if (computeTreeSize(assignment_expression_node) > computeTreeSize(initializer_list_node)) {
+      if (computeTreeSize(assignment_expression_node) >
+          computeTreeSize(initializer_list_node)) {
         self->addChild(assignment_expression_node);
       } else {
         self->addChild(initializer_list_node);
@@ -682,7 +681,42 @@ std::shared_ptr<Node> Parser::initializer()
 }
 std::shared_ptr<Node> Parser::initializer_list() {}
 std::shared_ptr<Node> Parser::compound_statement() {}
-std::shared_ptr<Node> Parser::statement() {}
+
+std::shared_ptr<Node> Parser::statement() {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  int saved_token_index = m_tokenIndex;
+
+  if (callNonterminalProcedure(&Parser::labeled_statement, self,
+                               saved_token_index)) {
+    return self;
+  }
+
+  if (callNonterminalProcedure(&Parser::expression_statement, self,
+                               saved_token_index)) {
+    return self;
+  }
+
+  if (callNonterminalProcedure(&Parser::compound_statement, self,
+                               saved_token_index)) {
+    return self;
+  }
+
+  if (callNonterminalProcedure(&Parser::selection_statement, self,
+                               saved_token_index)) {
+    return self;
+  }
+
+  if (callNonterminalProcedure(&Parser::iteration_statement, self,
+                               saved_token_index)) {
+    return self;
+  }
+
+  if (callNonterminalProcedure(&Parser::jump_statement, self,
+                               saved_token_index)) {
+    return self;
+  }
+}
+
 std::shared_ptr<Node> Parser::labeled_statement() {}
 std::shared_ptr<Node> Parser::expression_statement() {}
 std::shared_ptr<Node> Parser::selection_statement() {}
@@ -749,4 +783,17 @@ std::shared_ptr<Node> Parser::jump_statement() {
   }
 
   return self;
+}
+
+bool Parser::callNonterminalProcedure(std::shared_ptr<Node> (Parser::*fn)(),
+                                      std::shared_ptr<Node> self,
+                                      int tokenIndex) {
+  m_tokenIndex = tokenIndex;
+  std::shared_ptr<Node> node = (this->*fn)();
+  if (node->accepted) {
+    self->addChild(node);
+    return true;
+  } else {
+    return false;
+  }
 }
