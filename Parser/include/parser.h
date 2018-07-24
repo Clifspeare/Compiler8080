@@ -32,6 +32,8 @@ class Parser {
   int m_tokenIndex = 0;
   std::vector<Token> m_tokens;
 
+  int computeTreeSize(std::shared_ptr<Node> node);
+
   // TODO: add Type Registration for typedef
 
     // Recursive-descent non-terminal parsing routines

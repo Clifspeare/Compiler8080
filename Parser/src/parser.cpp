@@ -654,7 +654,32 @@ std::shared_ptr<Node> Parser::init_declarator()
   
   return self;
 }
-std::shared_ptr<Node> Parser::initializer() {}
+std::shared_ptr<Node> Parser::initializer() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+
+  std::shared_ptr<Node> assignment_expression_node = assignment_expression();
+  if (assignment_expression_node->accepted) {
+    self->addChild(assignment_expression_node);
+  } else {
+    std::shared_ptr<Node> initializer_list_node = initializer_list();
+    if (initializer_list_node->accepted) {
+      self->addChild(initializer_list_node);
+    } else {
+      // TODO: implement
+      // This function (won't have to be used much) calculates how far a node has been able to parse
+      // It traverses the depth and breadth of a tree, stopping in each direction when it finds a terminal mismatch.
+      // Technically i guess it could be a member method of Node...
+      if (computeTreeSize(assignment_expression_node) > computeTreeSize(initializer_list_node)) {
+        self->addChild(assignment_expression_node);
+      } else {
+        self->addChild(initializer_list_node);
+      }
+    }
+  }
+
+  return self;
+}
 std::shared_ptr<Node> Parser::initializer_list() {}
 std::shared_ptr<Node> Parser::compound_statement() {}
 std::shared_ptr<Node> Parser::statement() {}
@@ -707,6 +732,8 @@ std::shared_ptr<Node> Parser::jump_statement() {
     error_node->data = tok.value;
     error_node->accepted = false;
     self->addChild((error_node));
+
+    return self;
   }
 
   // Next input should be semi-colon, for all possible productions
