@@ -91,12 +91,12 @@ class Parser {
     std::shared_ptr<Node> initializer();
     std::shared_ptr<Node> initializer_list();
     std::shared_ptr<Node> compound_statement();
-    std::shared_ptr<Node> statement();
+    std::shared_ptr<Node> statement(); //
     std::shared_ptr<Node> labeled_statement();
     std::shared_ptr<Node> expression_statement();
     std::shared_ptr<Node> selection_statement();
     std::shared_ptr<Node> iteration_statement();
-    std::shared_ptr<Node> jump_statement();
+    std::shared_ptr<Node> jump_statement(); //
 };
 
 #endif
