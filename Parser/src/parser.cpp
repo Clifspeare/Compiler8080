@@ -719,8 +719,142 @@ std::shared_ptr<Node> Parser::statement() {
 
 std::shared_ptr<Node> Parser::labeled_statement() {} // TODO spencer
 std::shared_ptr<Node> Parser::expression_statement() {} // TODO spencer
-std::shared_ptr<Node> Parser::selection_statement() {} // TODO: Zach
-std::shared_ptr<Node> Parser::iteration_statement() {} // TODO: Zach
+std::shared_ptr<Node> Parser::selection_statement() {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::selection_statement;
+
+  Token tok = getNextToken();
+
+  if (tok.type == TokenType::IF && getNextToken().type == TokenType::OPEN_PARENS)
+  {
+    getNextToken();
+    if (callNonterminalProcedure(&Parser::expression, self,
+                                 m_tokenIndex))
+    {
+      if (getNextToken().type == TokenType::CLOSE_PARENS)
+      {
+        getNextToken();
+        if (callNonterminalProcedure(&Parser::statement, self,
+                                     m_tokenIndex))
+        {
+          if (getNextToken() == TokenType::ELSE)
+          {
+            getNextToken();
+            if (callNonterminalProcedure(&Parser::statement, self,
+                                         m_tokenIndex))
+            {
+              return self;
+            }
+          }
+          else
+          {
+            return self;
+          }
+        }
+      }
+    }
+  }
+
+  m_tokenIndex = start_index;
+  if (tok.type == TokenType::SWITCH)
+  {
+    if (GetNextToken().type == TokenType::OPEN_PARENS)
+    {
+      GetNextToken();
+      if (callNonterminalProcedure(&Parser::expression, self,
+                                   m_tokenIndex))
+      {
+        if (getNextToken().type == TokenType::CLOSE_PARENS)
+        {
+          getNextToken();
+          if (callNonterminalProcedure(&Parser::statement, self,
+                                       m_tokenIndex))
+          {
+            return self;
+          }
+        }
+      }
+    }
+  }
+} 
+
+std::shared_ptr<Node> Parser::iteration_statement() {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::iteration_statement;
+
+  int start_index = m_tokenIndex;
+
+  if (tok.type == TokenType::WHILE && getNextToken().type == TokenType::OPEN_PARENS)
+  {
+    getNextToken();
+    if (callNonterminalProcedure(&Parser::expression, self,
+                                 m_tokenIndex))
+    {
+      if (getNextToken().type == TokenType::CLOSE_PARENS)
+      {
+        getNextToken();
+        if (callNonterminalProcedure(&Parser::statement, self,
+                                     m_tokenIndex))
+        {
+          return self;
+        }
+      }
+    }
+  }
+
+  m_tokenIndex = start_index;
+  if (tok.type == TokenType::DO)
+  {
+    getNextToken();
+    if (callNonterminalProcedure(&Parser::statement, self,
+                                 m_tokenIndex))
+    {
+      if (tok.type == TokenType::WHILE && getNextToken().type == TokenType::OPEN_PARENS)
+      {
+        getNextToken();
+        if (callNonterminalProcedure(&Parser::expression, self,
+                                     m_tokenIndex))
+        {
+          if (getNextToken().type == TokenType::CLOSE_PARENS)
+          {
+            getNextToken();
+            if (callNonterminalProcedure(&Parser::statement, self,
+                                         m_tokenIndex))
+            {
+              return self;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  m_tokenIndex = start_index;
+  if (tok.type == TokenType::FOR && GetNextToken().type == TokenType::OPEN_PARENS)
+  {
+    getNextToken();
+    callNonterminalProcedure(&Parser::expression, self, m_tokenIndex);
+    if (GetNextToken().type == TokenType::SEMICOLON)
+    {
+      getNextToken();
+      callNonterminalProcedure(&Parser::expression, self, m_tokenIndex);
+      if (GetNextToken().type == TokenType::SEMICOLON)
+      {
+        getNextToken();
+        callNonterminalProcedure(&Parser::expression, self, m_tokenIndex);
+        if (GetNextToken() == TokenType::CLOSE_PARENS)
+        {
+          getNextToken();
+          if (callNonterminalProcedure(&Parser::statement, self,m_tokenIndex))
+          {
+            return self;
+          }
+        }
+      }
+    }
+  }
+}
+
 
 // TODO: test this.  I did it weird. (iterative instead of recursive to wrap my
 // head around left-refactoring)
