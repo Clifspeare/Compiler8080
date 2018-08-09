@@ -30,7 +30,8 @@ struct ErrorInfo {
   std::string actual_value;
 };
 
-ErrorInfo getErrorInfo(std::shared_ptr<Node>& node) {
+ErrorInfo getErrorInfo(std::shared_ptr<Node>& node) 
+{
   if (node->type == Type::ERROR) {
     ErrorInfo err_no;
     err_no.expected_type = node->parent->type;
@@ -46,12 +47,14 @@ ErrorInfo getErrorInfo(std::shared_ptr<Node>& node) {
 }
 
 // PRINT DEBUG
-void PrintErrorMessage(ErrorInfo info) {
+void PrintErrorMessage(ErrorInfo info) 
+{
   std::cout << "ERROR! AAH!" << std::endl;
 }
 
 // FILE's ENTRY POINT
-std::shared_ptr<Node> Parser::translation_unit() {
+std::shared_ptr<Node> Parser::translation_unit() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::TRANSLATION_UNIT;
   
@@ -67,17 +70,22 @@ std::shared_ptr<Node> Parser::translation_unit() {
 }
 
 // EXTERNAL DECLARATION (FUNCTION OR GLOBAL VARIABLE)
-std::shared_ptr<Node> Parser::external_declaration() {
+std::shared_ptr<Node> Parser::external_declaration() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   
-  callNonterminalProcedure(&Parser::function_definition, self);
+  if(callNonterminalProcedure(&Parser::function_definition, self)) {
+    return self;
+  }
+  
   callNonterminalProcedure(&Parser::declaration, self);
 
   return self;
 }
 
 // FUNCTION DEFINITION
-std::shared_ptr<Node> Parser::function_definition() {
+std::shared_ptr<Node> Parser::function_definition() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::FUNCTION_DEFINITION;
 
@@ -95,7 +103,8 @@ std::shared_ptr<Node> Parser::function_definition() {
 }
 
 //
-std::shared_ptr<Node> Parser::declaration_specifier() {
+std::shared_ptr<Node> Parser::declaration_specifier() 
+{
   // TODO: talk to Zach about possibly altering declaration_specifier() grammar.
 
   // std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -113,132 +122,148 @@ std::shared_ptr<Node> Parser::declaration_specifier() {
 
 // TODO: Segregate the terminals and non-terminals.
 
-std::shared_ptr<Node> Parser::storage_class_specifier() {
+std::shared_ptr<Node> Parser::storage_class_specifier() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::STORAGE_CLASS_SPECIFIER;
 
-  bool any_accepted = false;
+  bool terminal_rejected = false;
 
-  any_accepted = HandleTerminal(TokenType::AUTO, Type::AUTO, self)
-              || HandleTerminal(TokenType::REGISTER, Type::REGISTER, self)
-              || HandleTerminal(TokenType::STATIC, Type::STATIC, self)
-              || HandleTerminal(TokenType::EXTERN, Type::EXTERN, self)
-              || HandleTerminal(TokenType::TYPEDEF, Type::TYPEDEF, self);
-  if (!any_accepted) {
+  terminal_rejected = !(HandleTerminal(TokenType::AUTO, Type::AUTO, self)
+                     || HandleTerminal(TokenType::REGISTER, Type::REGISTER, self)
+                     || HandleTerminal(TokenType::EXTERN, Type::EXTERN, self)
+                     || HandleTerminal(TokenType::TYPEDEF, Type::TYPEDEF, self));
+                   
+  if (terminal_rejected) {
     HandleUnexpectedTerminal(self);
   }
 
   return self;
 }
 
-std::shared_ptr<Node> Parser::type_specifier() {
+std::shared_ptr<Node> Parser::type_specifier() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::TYPE_SPECIFIER;
 
-  int saved_token_index = m_tokenIndex;
-  Token nextToken = getNextToken();
-  if (nextToken.type == TokenType::VOID) {
-    std::shared_ptr<Node> void_node = std::make_shared<Node>();
-    void_node->type = Type::VOID;
-    void_node->accepted = true;
-    self->addChild(void_node);
-  } else if (nextToken.type == TokenType::CHAR) {
-    std::shared_ptr<Node> char_node = std::make_shared<Node>();
-    char_node->type = Type::CHAR;
-    char_node->accepted = true;
-    self->addChild(char_node);
-  } else if (nextToken.type == TokenType::SHORT) {
-    std::shared_ptr<Node> short_node = std::make_shared<Node>();
-    short_node->type = Type::SHORT;
-    short_node->accepted = true;
-    self->addChild(short_node);
-  } else if (nextToken.type == TokenType::INT) {
-    std::shared_ptr<Node> int_node = std::make_shared<Node>();
-    int_node->type = Type::INT;
-    int_node->accepted = true;
-    self->addChild(int_node);
-  } else if (nextToken.type == TokenType::LONG) {
-    std::shared_ptr<Node> long_node = std::make_shared<Node>();
-    long_node->type = Type::LONG;
-    long_node->accepted = true;
-    self->addChild(long_node);
-  } else if (nextToken.type == TokenType::FLOAT) {
-    std::shared_ptr<Node> float_node = std::make_shared<Node>();
-    float_node->type = Type::FLOAT;
-    float_node->accepted = true;
-    self->addChild(float_node);
-  } else if (nextToken.type == TokenType::DOUBLE) {
-    std::shared_ptr<Node> double_node = std::make_shared<Node>();
-    double_node->type = Type::DOUBLE;
-    double_node->accepted = true;
-    self->addChild(double_node);
-  } else if (nextToken.type == TokenType::SIGNED) {
-    std::shared_ptr<Node> signed_node = std::make_shared<Node>();
-    signed_node->type = Type::SIGNED;
-    signed_node->accepted = true;
-    self->addChild(signed_node);
-  } else if (nextToken.type == TokenType::UNSIGNED) {
-    std::shared_ptr<Node> unsigned_node = std::make_shared<Node>();
-    unsigned_node->type = Type::UNSIGNED;
-    unsigned_node->accepted = true;
-    self->addChild(unsigned_node);
-  } else {
-    std::shared_ptr<Node> struct_or_union_specifier_node;
-    std::shared_ptr<Node> enum_specifier_node;
-    std::shared_ptr<Node> typedef_name_node;
+  bool terminal_rejected = !(HandleTerminal(TokenType::VOID, Type::VOID, self)
+                          || HandleTerminal(TokenType::CHAR, Type::CHAR, self)
+                          || HandleTerminal(TokenType::SHORT, Type::SHORT, self)
+                          || HandleTerminal(TokenType::INT, Type::INT, self)
+                          || HandleTerminal(TokenType::LONG, Type::LONG, self)
+                          || HandleTerminal(TokenType::FLOAT, Type::FLOAT, self)
+                          || HandleTerminal(TokenType::DOUBLE, Type::DOUBLE, self)
+                          || HandleTerminal(TokenType::SIGNED, Type::SIGNED, self)
+                          || HandleTerminal(TokenType::UNSIGNED, Type::UNSIGNED, self));
 
-    struct_or_union_specifier_node = struct_or_union_specifier();
-    if (struct_or_union_specifier_node->accepted) {
-      self->addChild(struct_or_union_specifier_node);
-    } else {
-      m_tokenIndex = saved_token_index;
-      enum_specifier_node = enum_specifier();
-      if (enum_specifier_node->accepted) {
-        self->addChild(enum_specifier_node);
-      } else {
-        m_tokenIndex = saved_token_index;
-        typedef_name_node = typedef_name();
-        if (typedef_name_node->accepted) {
-          self->addChild(typedef_name_node);
-        } else {
-          m_tokenIndex = saved_token_index;  // not strictly necessary, since it
-                                             // *should* be handled higher
-          std::shared_ptr<Node> error_node = std::make_shared<Node>();
-          error_node->type = Type::ERROR;
-          error_node->data = nextToken.value;
-          error_node->accepted = true;
-          self->addChild(error_node);
-        }
-      }
-    }
-  }
+  callNonterminalProcedure(&Parser::struct_or_union_specifier, self, true);
+  
+  callNonterminalProcedure(&Parser::enum_specifier, self, true);
+  
+  callNonterminalProcedure(&Parser::typedef_name, self, true);
+
+  if (terminal_rejected) {
+    HandleUnexpectedTerminal(self);
+  } // handle case where it should be one of the nonterminals and they were partially successful and contain error?
+
+  return self;
 }
-std::shared_ptr<Node> Parser::struct_or_union_specifier() {}
-std::shared_ptr<Node> Parser::struct_or_union() {}
-std::shared_ptr<Node> Parser::struct_declaration() {}
-std::shared_ptr<Node> Parser::specifier_qualifier() {}
-std::shared_ptr<Node> Parser::struct_declarator_list() {}
-std::shared_ptr<Node> Parser::struct_declarator() {}
+
+std::shared_ptr<Node> Parser::struct_or_union_specifier() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::STRUCT_OR_UNION_SPECIFIER;
+
+  callNonterminalProcedure(&Parser::struct_or_union, self);
+  HandleTerminal(TokenType::ID, Type::IDENTIFIER, self);
+
+  if (HandleTerminal(TokenType::OPEN_BRACKET, Type::OPEN_BRACKET, self)) {
+    while(callNonterminalProcedure(&Parser::struct_declaration, self));
+    HandleTerminal(TokenType::CLOSE_BRACKET, Type::CLOSE_BRACKET, self, true);
+  }
+
+  return self;
+}
+
+std::shared_ptr<Node> Parser::struct_or_union() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::STRUCT_OR_UNION;
+
+  bool terminal_rejected = !(HandleTerminal(TokenType::STRUCT, Type::STRUCT, self)
+                        ||   HandleTerminal(TokenType::UNION, Type::UNION, self));
+  if (terminal_rejected) {
+    HandleUnexpectedTerminal(self);
+  }
+
+  return self;
+}
+
+std::shared_ptr<Node> Parser::struct_declaration()
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::STRUCT_DECLARATION;
+
+  while (callNonterminalProcedure(&Parser::specifier_qualifier, self, true));
+
+  callNonterminalProcedure(&Parser::struct_declarator_list, self);
+
+  return self;
+}
+
+std::shared_ptr<Node> Parser::specifier_qualifier() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::STRUCT_DECLARATION;
+
+  bool rejected_nonterminal = !(callNonterminalProcedure(&Parser::type_specifier, self, true)
+                            || callNonterminalProcedure(&Parser::type_qualifier, self, true));
+  if (rejected_nonterminal) {
+    // unexpected terminal where nonterminal is expected TODO: handle gracefully
+  }
+  return self;
+}
+
+std::shared_ptr<Node> Parser::struct_declarator_list()
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::STRUCT_DECLARATOR_LIST;
+
+  while(callNonterminalProcedure(&Parser::struct_declarator, self)) {
+    if (!HandleTerminal(TokenType::COMMA, Type::COMMA, self)) {
+      break; 
+    };
+  }
+
+  return self; 
+}
+
+std::shared_ptr<Node> Parser::struct_declarator() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::STRUCT_DECLARATOR;
+
+  callNonterminalProcedure(&Parser::declarator, self, true);
+  if (HandleTerminal(TokenType::COLON, Type::COLON, self)) {
+    callNonterminalProcedure(&Parser::constant_expression, self)
+  }
+  return self;
+}
 
 //
 std::shared_ptr<Node> Parser::declarator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::DECLARATOR;
 
-  int saved_token_index = m_tokenIndex;
-  std::shared_ptr<Node> pointer_node = pointer();
-  if (pointer_node->accepted) {
-    self->addChild((pointer_node));
-  } else {
-    m_tokenIndex = saved_token_index;
-  }
-
-  std::shared_ptr<Node> direct_declarator_node = direct_declarator();
-  self->addChild((direct_declarator_node));
+  callNonterminalProcedure(&Parser::pointer, self, true);
+  callNonterminalProcedure(&Parser::direct_declarator, self);
 
   return self;
 }
-std::shared_ptr<Node> Parser::pointer() {}
+std::shared_ptr<Node> Parser::pointer() 
+{
+  HandleTerminal(TokenType::STAR, )
+}
 std::shared_ptr<Node> Parser::type_qualifier() {}
 std::shared_ptr<Node> Parser::direct_declarator() {}
 std::shared_ptr<Node> Parser::constant_expression() {}
@@ -321,58 +346,20 @@ std::shared_ptr<Node> Parser::primary_expression() {
   return self;
 }
 std::shared_ptr<Node> Parser::constant() {}
+
 std::shared_ptr<Node> Parser::expression() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::EXPRESSION;
 
-  std::shared_ptr<Node> assignment_expression_node = assignment_expression();
-  if (assignment_expression_node->accepted) {
-    self->addChild((assignment_expression_node));
-
-    // Here, we save the index into our token list because we will be
-    // progressing through the input until such time as we pass the last token
-    // usable by us.  We will always have to backtrack at least one token.
-    int input_index = m_tokenIndex;
-    Token tok = getNextToken();
-    bool still_recursing = true;
-    while (still_recursing) {
-      if (tok.type == TokenType::COMMA) {
-        std::shared_ptr<Node> comma_node = std::make_shared<Node>();
-        comma_node->accepted = true;
-        comma_node->type = Type::COMMA;
-        comma_node->data = tok.value;
-
-        std::shared_ptr<Node> inner_assignment_expression_node =
-            assignment_expression();
-        if (inner_assignment_expression_node
-                ->accepted) {  // Both the comma and assignment-expression are
-                               // valid, so we can add them to the expression
-                               // node and continue
-          self->addChild((comma_node));
-          self->addChild((inner_assignment_expression_node));
-        } else {  // Comma was valid, but assignment-expression wasn't, so
-                  // neither can be added.  And stop looping.
-          still_recursing = false;
-
-          // restore token index from before comma
-          m_tokenIndex = input_index;
-        }
-
-      } else {  // stop looping to continue expression, and add the token (which
-                // we can't use) back on the input
-        still_recursing = false;
-        --m_tokenIndex;
-      }
-
-      // update input_input after correct loop pass
-      input_index = m_tokenIndex;
-    }
-  } else {
-    self->addChild((assignment_expression_node));
+  while(callNonterminalProcedure(&Parser::assignment_expression, self)) {
+    if (!HandleTerminal(TokenType::COMMA, Type::COMMA, self)) {
+      break; 
+    };
   }
 
-  return self;
+  return self; 
 }
+
 std::shared_ptr<Node> Parser::assignment_expression() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::ASSIGNMENT_EXPRESSION;
@@ -856,8 +843,9 @@ bool Parser::callNonterminalProcedure(std::shared_ptr<Node> (Parser::*fn)(),
                                       bool optional) {
   int tokenIndex = m_tokenIndex;
   std::shared_ptr<Node> node = (this->*fn)();
-  if (optional == false)
+  if (optional == false) {
     self->addChild(node);
+  }
   if (node->accepted) {
     if (optional == true) {
       self->addChild(node);
@@ -883,8 +871,10 @@ std::shared_ptr<Node> Parser::keyword_if() {
   return self;
 }
 
-bool Parser::HandleTerminal(TokenType token_type, Type node_type, std::shared_ptr<Node> self) {
+bool Parser::HandleTerminal(TokenType token_type, Type node_type, std::shared_ptr<Node> self, bool mandatory) {
   std::shared_ptr<Node> terminal_node = std::make_shared<Node>();
+
+  int tokenIndex = m_tokenIndex;
   Token tok = getNextToken();
 
   if(tok.type == token_type) {
@@ -892,9 +882,17 @@ bool Parser::HandleTerminal(TokenType token_type, Type node_type, std::shared_pt
     self->accepted = true;
     self->addChild(terminal_node);
     return true;
+  } else {
+    if (mandatory) {
+      self->type = Type::ERROR;
+      self->data = getNextToken().value;
+      self->accepted = false;
+      self->addChild(terminal_node);
+    } else {
+      m_tokenIndex = tokenIndex;
+      return false;
+    }
   }
-
-  return false;
 }
 
 bool Parser::HandleUnexpectedTerminal(std::shared_ptr<Node> self)
@@ -902,9 +900,7 @@ bool Parser::HandleUnexpectedTerminal(std::shared_ptr<Node> self)
   std::shared_ptr<Node> unexpected_terminal = std::make_shared<Node>();
   unexpected_terminal->type = Type::ERROR;
 
-  int tokenIndex = m_tokenIndex;
   unexpected_terminal->data = getNextToken().value;
-  m_tokenIndex = tokenIndex;
 
   unexpected_terminal->accepted = false;
   self->addChild(unexpected_terminal);
