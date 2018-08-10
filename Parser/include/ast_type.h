@@ -63,7 +63,6 @@ enum class Type {
   STRUCT_OR_UNION,
   CONST_KEYWORD,
   VOLATILE_KEYWORD,
-  IDENTIFIER,
   COLON,
 
   IF,

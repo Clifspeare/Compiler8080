@@ -59,7 +59,7 @@ std::shared_ptr<Node> Parser::translation_unit()
   self->type = Type::TRANSLATION_UNIT;
   
   while (HasTokens()) {
-    bool compilation_error = !(callNonterminalProcedure(Parser::external_declaration, self));
+    bool compilation_error = !(callNonterminalProcedure(&Parser::external_declaration, self));
 
     if(compilation_error) {
       PrintErrorMessage(getErrorInfo(self));
@@ -245,7 +245,7 @@ std::shared_ptr<Node> Parser::struct_declarator()
 
   callNonterminalProcedure(&Parser::declarator, self, true);
   if (HandleTerminal(TokenType::COLON, Type::COLON, self)) {
-    callNonterminalProcedure(&Parser::constant_expression, self)
+    callNonterminalProcedure(&Parser::constant_expression, self);
   }
   return self;
 }
