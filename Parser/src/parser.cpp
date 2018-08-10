@@ -77,7 +77,7 @@ std::shared_ptr<Node> Parser::external_declaration()
   if(callNonterminalProcedure(&Parser::function_definition, self)) {
     return self;
   }
-  
+
   callNonterminalProcedure(&Parser::declaration, self);
 
   return self;
@@ -260,14 +260,50 @@ std::shared_ptr<Node> Parser::declarator() {
 
   return self;
 }
-std::shared_ptr<Node> Parser::pointer() 
+std::shared_ptr<Node> Parser::pointer() //TODO: this one hurts me.  maybe overthinking.  might as well leave it to Monday.
 {
-  HandleTerminal(TokenType::STAR, )
 }
-std::shared_ptr<Node> Parser::type_qualifier() {}
-std::shared_ptr<Node> Parser::direct_declarator() {}
-std::shared_ptr<Node> Parser::constant_expression() {}
-std::shared_ptr<Node> Parser::logical_or_expression() {}
+std::shared_ptr<Node> Parser::type_qualifier() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::TYPE_QUALIFIER;
+
+  auto terminal_rejected = !(HandleTerminal(TokenType::CONST, Type::CONST_KEYWORD, self)
+                        || HandleTerminal(TokenType::VOLATILE, Type::VOLATILE_KEYWORD, self));
+  if (terminal_rejected) {
+    HandleUnexpectedTerminal(self);
+  }
+
+  return self;
+}
+
+//TODO left-recursive
+std::shared_ptr<Node> Parser::direct_declarator() 
+{
+
+}
+std::shared_ptr<Node> Parser::constant_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::CONSTANT_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::conditional_expression, self);
+
+  return self;
+}
+std::shared_ptr<Node> Parser::logical_or_expression() 
+{
+  // left refactoring is any number of (logical_and_expression || logical_and_expression || ... || logical_and_expression)
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::LOGICAL_OR_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::logical_and_expression, self);
+  while (HandleTerminal(TokenType::OR_OR, Type::LOGICAL_OR_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::logical_and_expression, self);
+  }
+
+  return self;
+}
 std::shared_ptr<Node> Parser::logical_and_expression() {}
 std::shared_ptr<Node> Parser::inclusive_or_expression() {}
 std::shared_ptr<Node> Parser::and_expression() {}
@@ -508,7 +544,7 @@ std::shared_ptr<Node> Parser::unary_operator() {
   } else if (tok.type == TokenType::STAR) {
     std::shared_ptr<Node> pointer_op_node = std::make_shared<Node>();
     pointer_op_node->accepted = true;
-    pointer_op_node->type = Type::POINTER_OP;
+    pointer_op_node->type = Type::REFERENCE;
     pointer_op_node->data = tok.value;
     self->addChild((pointer_op_node));
   } else if (tok.type == TokenType::PLUS) {
