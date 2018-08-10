@@ -405,7 +405,20 @@ std::shared_ptr<Node> Parser::additive_expression()
   
   return self;
 }
-std::shared_ptr<Node> Parser::multiplicative_expression() {}
+std::shared_ptr<Node> Parser::multiplicative_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::MULTIPLICATIVE_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::cast_expression, self);
+  while (HandleTerminal(TokenType::STAR, Type::MULTIPLICATION_OPERATOR, self) 
+        || HandleTerminal(TokenType::SLASH, Type::DIVISION_OPERATOR, self)
+        || HandleTerminal(TokenType::PERCENT, Type::MODULUS_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::cast_expression, self);
+  }
+
+  return self;
+}
 std::shared_ptr<Node> Parser::cast_expression() {}
 std::shared_ptr<Node> Parser::unary_expression() {}
 std::shared_ptr<Node> Parser::postfix_expression() {}
