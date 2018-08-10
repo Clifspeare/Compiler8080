@@ -393,7 +393,18 @@ std::shared_ptr<Node> Parser::shift_expression()
   
   return self;
 }
-std::shared_ptr<Node> Parser::additive_expression() {}
+std::shared_ptr<Node> Parser::additive_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::ADDITIVE_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::multiplicative_expression, self);
+  while (HandleTerminal(TokenType::PLUS, Type::ADDITION_OPERATOR, self) || HandleTerminal(TokenType::MINUS, Type::SUBTRACTION_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::multiplicative_expression, self);
+  }
+  
+  return self;
+}
 std::shared_ptr<Node> Parser::multiplicative_expression() {}
 std::shared_ptr<Node> Parser::cast_expression() {}
 std::shared_ptr<Node> Parser::unary_expression() {}
