@@ -62,6 +62,7 @@ class Parser {
     std::shared_ptr<Node> logical_or_expression();
     std::shared_ptr<Node> logical_and_expression();
     std::shared_ptr<Node> inclusive_or_expression();
+    std::shared_ptr<Node> exclusive_or_expression();
     std::shared_ptr<Node> and_expression();
     std::shared_ptr<Node> conditional_expression();
     std::shared_ptr<Node> equality_expression();

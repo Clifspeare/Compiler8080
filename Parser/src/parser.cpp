@@ -304,10 +304,68 @@ std::shared_ptr<Node> Parser::logical_or_expression()
 
   return self;
 }
-std::shared_ptr<Node> Parser::logical_and_expression() {}
-std::shared_ptr<Node> Parser::inclusive_or_expression() {}
-std::shared_ptr<Node> Parser::and_expression() {}
-std::shared_ptr<Node> Parser::equality_expression() {}
+std::shared_ptr<Node> Parser::logical_and_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::LOGICAL_AND_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::inclusive_or_expression, self);
+  while (HandleTerminal(TokenType::AND_AND, Type::LOGICAL_AND_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::inclusive_or_expression, self);
+  }
+  
+  return self;
+}
+std::shared_ptr<Node> Parser::inclusive_or_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::INCLUSIVE_OR_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::exclusive_or_expression, self);
+  while (HandleTerminal(TokenType::OR, Type::BITWISE_OR_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::exclusive_or_expression, self);
+  }
+
+  return self;
+}
+
+std::shared_ptr<Node> Parser::exclusive_or_expression()
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::EXCLUSIVE_OR_EXPRESSION;
+  
+  callNonterminalProcedure(&Parser::and_expression, self);
+  while (HandleTerminal(TokenType::XOR, Type::XOR_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::and_expression, self);
+  }
+
+  return self;
+}
+std::shared_ptr<Node> Parser::and_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::BITWISE_AND_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::equality_expression, self);
+  while (HandleTerminal(TokenType::AND, Type::BITWISE_AND_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::equality_expression, self);
+  }
+  
+  return self;
+}
+std::shared_ptr<Node> Parser::equality_expression() 
+{
+  // left-refactored is: (relational_expression [!= or ==] relational_expression [!= or ==] ... [!= or ==] relational_expression)
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::EQUALITY_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::relational_expression, self);
+  while (HandleTerminal(TokenType::NOT_EQUAL, Type::NOT_EQUAL_OPERATOR, self) || HandleTerminal(TokenType::EQUAL_EQUAL, Type::EQUALITY_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::relational_expression, self);
+  }
+
+  return self;
+}
 std::shared_ptr<Node> Parser::relational_expression() {}
 std::shared_ptr<Node> Parser::shift_expression() {}
 std::shared_ptr<Node> Parser::additive_expression() {}
