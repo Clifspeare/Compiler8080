@@ -366,7 +366,21 @@ std::shared_ptr<Node> Parser::equality_expression()
 
   return self;
 }
-std::shared_ptr<Node> Parser::relational_expression() {} // TODO
+std::shared_ptr<Node> Parser::relational_expression()
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::RELATIONAL_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::shift_expression, self);
+  while (HandleTerminal(TokenType::LESS_THAN, Type::LESS_THAN_OPERATOR, self)
+        || HandleTerminal(TokenType::GREATER_THAN, Type::GREATER_THAN_OPERATOR, self)
+        || HandleTerminal(TokenType::LESS_EQUAL, Type::LESS_THAN_EQUAL_OPERATOR, self)
+        || HandleTerminal(TokenType::GREATER_EQUAL, Type::GREATER_THAN_EQUAL_OPERATOR, self)) {
+    callNonterminalProcedure(&Parser::shift_expression, self);
+  }
+
+  return self;
+}
 std::shared_ptr<Node> Parser::shift_expression() {}
 std::shared_ptr<Node> Parser::additive_expression() {}
 std::shared_ptr<Node> Parser::multiplicative_expression() {}
