@@ -507,28 +507,14 @@ std::shared_ptr<Node> Parser::assignment_expression() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::ASSIGNMENT_EXPRESSION;
 
-  int saved_input_index = m_tokenIndex;
+  callNonterminalProcedure(&Parser::conditional_expression, self, true);
 
-  std::shared_ptr<Node> conditional_expression_node = conditional_expression();
-  if (conditional_expression_node->accepted) {
-    self->addChild((conditional_expression_node));
-  } else {
-    m_tokenIndex = saved_input_index;
-
-    std::shared_ptr<Node> unary_expression_node = unary_expression();
-    std::shared_ptr<Node> assignment_operator_node = assignment_operator();
-    std::shared_ptr<Node> assignment_expression_node = assignment_expression();
-
-    self->addChild((unary_expression_node));
-    self->addChild((assignment_operator_node));
-    self->addChild((assignment_expression_node));
-
-    if (!unary_expression_node->accepted ||
-        !assignment_operator_node->accepted ||
-        !assignment_expression_node->accepted) {
-      self->accepted = false;
-    }
+  if (callNonterminalProcedure(&Parser::unary_expression, self, true)) {
+    callNonterminalProcedure(&Parser::assignment_operator, self);
+    callNonterminalProcedure(&Parser::assignment_expression, self);
   }
+
+  // TODO for error handling, disambiguate between branches.
 
   return self;
 }
