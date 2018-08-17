@@ -6,4 +6,4 @@ void Node::addChild(std::shared_ptr<Node> node) {
     this->accepted = false;
   }
   this->children.push_back(node);
-}
+}//
