@@ -69,7 +69,6 @@ std::shared_ptr<Node> Parser::translation_unit()
   return self;
 }
 
-// EXTERNAL DECLARATION (FUNCTION OR GLOBAL VARIABLE)
 std::shared_ptr<Node> Parser::external_declaration() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -83,7 +82,6 @@ std::shared_ptr<Node> Parser::external_declaration()
   return self;
 }
 
-// FUNCTION DEFINITION
 std::shared_ptr<Node> Parser::function_definition() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -102,34 +100,28 @@ std::shared_ptr<Node> Parser::function_definition()
   return self;
 }
 
-//
 std::shared_ptr<Node> Parser::declaration_specifier() 
 {
-  // TODO: talk to Zach about possibly altering declaration_specifier() grammar.
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::DECLARATION_SPECIFIER;
 
-  // std::shared_ptr<Node> self = std::make_shared<Node>();
-  // self->type = Type::DECLARATION_SPECIFIER;
+  bool nonterminal_rejected = !(callNonterminalProcedure(&Parser::storage_class_specifier, self, true)
+                            || callNonterminalProcedure(&Parser::type_specifier, self, true)
+                            || callNonterminalProcedure(&Parser::type_qualifier, self, true));
 
-  // std::shared_ptr<Node> storage_class_specifier_node;
-  // std::shared_ptr<Node> type_specifier_node;
-  // std::shared_ptr<Node> type_qualifier_node;
+  if (nonterminal_rejected) {
+    // create and propogate error
+  }
 
-  // int saved_token_index = m_tokenIndex;
-  // storage_class_specifier_node
-
-  // return self;
+  return self;
 }
-
-// TODO: Segregate the terminals and non-terminals.
 
 std::shared_ptr<Node> Parser::storage_class_specifier() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::STORAGE_CLASS_SPECIFIER;
 
-  bool terminal_rejected = false;
-
-  terminal_rejected = !(HandleTerminal(TokenType::AUTO, Type::AUTO, self)
+  bool terminal_rejected = !(HandleTerminal(TokenType::AUTO, Type::AUTO, self)
                      || HandleTerminal(TokenType::REGISTER, Type::REGISTER, self)
                      || HandleTerminal(TokenType::EXTERN, Type::EXTERN, self)
                      || HandleTerminal(TokenType::TYPEDEF, Type::TYPEDEF, self));
@@ -260,16 +252,27 @@ std::shared_ptr<Node> Parser::declarator() {
 
   return self;
 }
-std::shared_ptr<Node> Parser::pointer() //TODO: this one hurts me.  maybe overthinking.  might as well leave it to Monday.
+
+std::shared_ptr<Node> Parser::pointer()
 {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::POINTER;
+
+  if(HandleTerminal(TokenType::STAR, Type::POINTER, self, true)) {
+    while(callNonterminalProcedure(&Parser::type_qualifier, self, true));
+    callNonterminalProcedure(&Parser::pointer, self, true);
+  }
+
+  return self;        
 }
+
 std::shared_ptr<Node> Parser::type_qualifier() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::TYPE_QUALIFIER;
 
-  auto terminal_rejected = !(HandleTerminal(TokenType::CONST, Type::CONST_KEYWORD, self)
-                        || HandleTerminal(TokenType::VOLATILE, Type::VOLATILE_KEYWORD, self));
+  bool terminal_rejected = !(HandleTerminal(TokenType::CONST, Type::CONST_KEYWORD, self)
+                         || HandleTerminal(TokenType::VOLATILE, Type::VOLATILE_KEYWORD, self));
   if (terminal_rejected) {
     HandleUnexpectedTerminal(self);
   }
@@ -277,11 +280,66 @@ std::shared_ptr<Node> Parser::type_qualifier()
   return self;
 }
 
-//TODO left-recursive
 std::shared_ptr<Node> Parser::direct_declarator() 
 {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::DIRECT_DECLARATOR;
 
+  bool identifier_branch = true;
+  bool declarator_branch = true;
+  bool const_expr_case = true;
+  bool parameter_type_list_case = true;
+  bool identifier_case = true;
+
+  while(identifier_branch || declarator_branch) {
+    // <identifier>
+    identifier_branch = HandleTerminal(TokenType::ID, Type::IDENTIFIER, self);
+    // ( <declarator> )
+    declarator_branch = HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self)
+                     && callNonterminalProcedure(&Parser::declarator, self, true)
+                     && HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self);
+
+    if(!identifier_branch && !declarator_branch) {
+      break;
+    }
+
+    while(const_expr_case || parameter_type_list_case || identifier_case) {
+      // { [ {constant-expression>}? ] }*
+      const_expr_case = false;
+      if(HandleTerminal(TokenType::OPEN_BRACKET, Type::OPEN_BRACKET, self)) {
+        const_expr_case = true;
+        callNonterminalProcedure(&Parser::constant_expression, self, true);
+        if(!HandleTerminal(TokenType::CLOSE_BRACKET, Type::CLOSE_BRACKET, self)) {
+          return self;
+        }
+      }
+
+      // { ( <parameter-type-list> ) }*
+      parameter_type_list_case = false;
+      if(HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self)) {
+        const_expr_case = true;
+        callNonterminalProcedure(&Parser::parameter_type_list, self, true);
+        if(!HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self)) {
+          return self;
+        }
+      }
+
+      // { ( {<identifer>}* ) }*
+      identifier_case = false;
+      if(HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self)) {
+        const_expr_case = true;
+        HandleTerminal(TokenType::ID, Type::IDENTIFIER, self);
+        while (HandleTerminal(TokenType::COMMA, Type::COMMA, self)){
+          HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);          
+        }
+        if(!HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self)) {
+          return self;
+        }
+      }      
+    }
+  }
 }
+
 std::shared_ptr<Node> Parser::constant_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -291,9 +349,9 @@ std::shared_ptr<Node> Parser::constant_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::logical_or_expression() 
 {
-  // left refactoring is any number of (logical_and_expression || logical_and_expression || ... || logical_and_expression)
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::LOGICAL_OR_EXPRESSION;
 
@@ -304,6 +362,7 @@ std::shared_ptr<Node> Parser::logical_or_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::logical_and_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -316,6 +375,7 @@ std::shared_ptr<Node> Parser::logical_and_expression()
   
   return self;
 }
+
 std::shared_ptr<Node> Parser::inclusive_or_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -341,6 +401,7 @@ std::shared_ptr<Node> Parser::exclusive_or_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::and_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -353,9 +414,9 @@ std::shared_ptr<Node> Parser::and_expression()
   
   return self;
 }
+
 std::shared_ptr<Node> Parser::equality_expression() 
 {
-  // left-refactored is: (relational_expression [!= or ==] relational_expression [!= or ==] ... [!= or ==] relational_expression)
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::EQUALITY_EXPRESSION;
 
@@ -366,6 +427,7 @@ std::shared_ptr<Node> Parser::equality_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::relational_expression()
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -381,6 +443,7 @@ std::shared_ptr<Node> Parser::relational_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::shift_expression()
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -405,6 +468,7 @@ std::shared_ptr<Node> Parser::additive_expression()
   
   return self;
 }
+
 std::shared_ptr<Node> Parser::multiplicative_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -419,75 +483,28 @@ std::shared_ptr<Node> Parser::multiplicative_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::cast_expression() {}
 std::shared_ptr<Node> Parser::unary_expression() {}
 std::shared_ptr<Node> Parser::postfix_expression() {}
-std::shared_ptr<Node> Parser::primary_expression() {
-  /*
-   * Primary expression is the most basic form of expression, consisting of an
-   * identifier, string-literal, or numeric-constant. It can be surrounded by
-   * any number of parentheses?
-   */
+std::shared_ptr<Node> Parser::primary_expression() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::PRIMARY_EXPRESSION;
 
-  // primary_expression is NOT an error handling node, so we don't save
-  // m_tokenIndex here prior to getNextToken
-  Token nextToken = getNextToken();
-  if (nextToken.type == TokenType::ID) {
-    std::shared_ptr<Node> identifier_node = std::make_shared<Node>();
-    identifier_node->type = Type::IDENTIFIER;
-    identifier_node->accepted = true;
-    // TODO: identifier_node.value or .data, etc should 'point' to an entry in a
-    // symbol table describing the identifier For now, just the name
-    identifier_node->data = nextToken.value;
-    self->addChild((identifier_node));
-  } else if (nextToken.type == TokenType::CONSTANT) {
-    std::shared_ptr<Node> numeric_node = std::make_shared<Node>();
-    numeric_node->type = Type::CONSTANT;
-    numeric_node->accepted = true;
-    numeric_node->data = nextToken.value;
-    self->addChild((numeric_node));
-  } else if (nextToken.type == TokenType::LITERAL) {
-    std::shared_ptr<Node> string_node = std::make_shared<Node>();
-    string_node->type = Type::STRING;
-    string_node->accepted = true;
-    // Should be in string literal table...
-    string_node->data = nextToken.value;
-    self->addChild((string_node));
-  } else if (nextToken.type == TokenType::OPEN_PARENS) {
-    std::shared_ptr<Node> left_parens = std::make_shared<Node>();
-    std::shared_ptr<Node> expression_node = expression();
-    std::shared_ptr<Node> right_parens = std::make_shared<Node>();
-
-    left_parens->accepted = true;
-    left_parens->type = Type::LEFT_PARENTHESIS;
-    right_parens->type = Type::RIGHT_PARENTHESIS;
-
-    if (!expression_node->accepted) {
-      self->accepted = false;
-    } else {
-      nextToken = getNextToken();
-      if (nextToken.type != TokenType::CLOSE_PARENS) {
-        right_parens->accepted = false;
-        right_parens->data = nextToken.value;
-        self->addChild((right_parens));
-      } else {
-        self->addChild((right_parens));
-      }
+  HandleTerminal(TokenType::ID, Type::IDENTIFIER, self);
+  HandleTerminal(TokenType::CONSTANT, Type::CONSTANT, self);
+  HandleTerminal(TokenType::LITERAL, Type::STRING, self);
+  if(HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self)) {
+    callNonterminalProcedure(&Parser::expression, self);
+    if(HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true)) {
+      return self;      
     }
-    self->addChild((left_parens));
-    self->addChild((expression_node));
-  } else {
-    std::shared_ptr<Node> error_node = std::make_shared<Node>();
-    error_node->type = Type::ERROR;
-    error_node->data = nextToken.value;
-    error_node->accepted = false;
-    self->addChild((error_node));
   }
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::constant() {}
 
 std::shared_ptr<Node> Parser::expression() {
@@ -525,98 +542,20 @@ std::shared_ptr<Node> Parser::assignment_operator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::ASSIGNMENT_OPERATOR;
 
-  Token tok = getNextToken();
+  bool terminal_rejected = !(HandleTerminal(TokenType::EQUAL, Type::ASSIGNMENT_OPERATOR, self)
+                        ||   HandleTerminal(TokenType::STAR_EQUAL, Type::MULTIPLICATION_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::SLASH_EQUAL, Type::DIVISION_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::PERCENT_EQUAL, Type::MODULUS_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::PLUS_EQUAL, Type::ADDITION_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::MINUS_EQUAL, Type::SUBTRACTION_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::LESS_LESS_EQUAL, Type::LEFTSHIFT_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::GREATER_GREATER_EQUAL, Type::RIGHTSHIFT_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::AND_EQUAL, Type::BITWISE_AND_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::XOR_EQUAL, Type::XOR_ASSIGNMENT, self)
+                        ||   HandleTerminal(TokenType::OR_EQUAL, Type::BITWISE_OR_ASSIGNMENT, self));
 
-  if (tok.type == TokenType::EQUAL) {
-    // =
-    std::shared_ptr<Node> assignment_node = std::make_shared<Node>();
-    assignment_node->accepted = true;
-    assignment_node->type = Type::UNARY_ASSIGNMENT;
-    assignment_node->data = tok.value;
-    self->addChild((assignment_node));
-  } else if (tok.type == TokenType::STAR_EQUAL) {
-    // *=
-    std::shared_ptr<Node> assign_multiply_result_node =
-        std::make_shared<Node>();
-    assign_multiply_result_node->accepted = true;
-    assign_multiply_result_node->type = Type::MULTIPLICATION_ASSIGNMENT;
-    assign_multiply_result_node->data = tok.value;
-    self->addChild((assign_multiply_result_node));
-  } else if (tok.type == TokenType::SLASH_EQUAL) {
-    // /=
-    std::shared_ptr<Node> assign_divide_result_node = std::make_shared<Node>();
-    assign_divide_result_node->accepted = true;
-    assign_divide_result_node->type = Type::DIVISION_ASSIGNMENT;
-    assign_divide_result_node->data = tok.value;
-    self->addChild((assign_divide_result_node));
-  } else if (tok.type == TokenType::PERCENT_EQUAL) {
-    // %=
-    std::shared_ptr<Node> assign_modulus_result_node = std::make_shared<Node>();
-    assign_modulus_result_node->accepted = true;
-    assign_modulus_result_node->type = Type::MODULUS_ASSIGNMENT;
-    assign_modulus_result_node->data = tok.value;
-    self->addChild((assign_modulus_result_node));
-  } else if (tok.type == TokenType::PLUS_EQUAL) {
-    // +=
-    std::shared_ptr<Node> assign_addition_result_node =
-        std::make_shared<Node>();
-    assign_addition_result_node->accepted = true;
-    assign_addition_result_node->type = Type::ADDITION_ASSIGNMENT;
-    assign_addition_result_node->data = tok.value;
-    self->addChild((assign_addition_result_node));
-  } else if (tok.type == TokenType::MINUS_EQUAL) {
-    // -=
-    std::shared_ptr<Node> assign_subtraction_result_node =
-        std::make_shared<Node>();
-    assign_subtraction_result_node->accepted = true;
-    assign_subtraction_result_node->type = Type::SUBTRACTION_ASSIGNMENT;
-    assign_subtraction_result_node->data = tok.value;
-    self->addChild((assign_subtraction_result_node));
-  } else if (tok.type == TokenType::LESS_LESS_EQUAL) {
-    // <<=
-    std::shared_ptr<Node> assign_left_shift_result_node =
-        std::make_shared<Node>();
-    assign_left_shift_result_node->accepted = true;
-    assign_left_shift_result_node->type = Type::LEFTSHIFT_ASSIGNMENT;
-    assign_left_shift_result_node->data = tok.value;
-    self->addChild((assign_left_shift_result_node));
-  } else if (tok.type == TokenType::GREATER_GREATER_EQUAL) {
-    // >>=
-    std::shared_ptr<Node> assign_right_shift_result_node =
-        std::make_shared<Node>();
-    assign_right_shift_result_node->accepted = true;
-    assign_right_shift_result_node->type = Type::RIGHTSHIFT_ASSIGNMENT;
-    assign_right_shift_result_node->data = tok.value;
-    self->addChild((assign_right_shift_result_node));
-  } else if (tok.type == TokenType::AND_EQUAL) {
-    // &=
-    std::shared_ptr<Node> assign_bitwise_and_result_node =
-        std::make_shared<Node>();
-    assign_bitwise_and_result_node->accepted = true;
-    assign_bitwise_and_result_node->type = Type::BITWISE_AND_ASSIGNMENT;
-    assign_bitwise_and_result_node->data = tok.value;
-    self->addChild((assign_bitwise_and_result_node));
-  } else if (tok.type == TokenType::XOR_EQUAL) {
-    // ^=
-    std::shared_ptr<Node> assign_xor_result_node = std::make_shared<Node>();
-    assign_xor_result_node->accepted = true;
-    assign_xor_result_node->type = Type::XOR_ASSIGNMENT;
-    assign_xor_result_node->data = tok.value;
-    self->addChild((assign_xor_result_node));
-  } else if (tok.type == TokenType::OR_EQUAL) {
-    // |=
-    std::shared_ptr<Node> assign_bitwise_or_result_node =
-        std::make_shared<Node>();
-    assign_bitwise_or_result_node->accepted = true;
-    assign_bitwise_or_result_node->type = Type::BITWISE_OR_ASSIGNMENT;
-    assign_bitwise_or_result_node->data = tok.value;
-    self->addChild((assign_bitwise_or_result_node));
-  } else {  // Error, token does not match expected terminal.
-    std::shared_ptr<Node> error_node = std::make_shared<Node>();
-    error_node->type = Type::ERROR;
-    error_node->data = tok.value;
-    error_node->accepted = false;
-    self->addChild((error_node));
+  if (terminal_rejected) {
+    HandleUnexpectedTerminal(self);
   }
 
   return self;
@@ -626,50 +565,16 @@ std::shared_ptr<Node> Parser::unary_operator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::UNARY_OPERATOR;
 
-  Token tok = getNextToken();
+  bool tokens_rejected = 
+  !(HandleTerminal(TokenType::AND, Type::UNARY_AND, self)
+  || HandleTerminal(TokenType::STAR, Type::REFERENCE, self)
+  || HandleTerminal(TokenType::PLUS, Type::UNARY_POSITIVE, self)
+  || HandleTerminal(TokenType::MINUS, Type::UNARY_NEGATIVE, self)
+  || HandleTerminal(TokenType::TILDE, Type::BITWISE_NOT, self)
+  || HandleTerminal(TokenType::NOT, Type::UNARY_NOT, self));
 
-  if (tok.type == TokenType::AND) {
-    std::shared_ptr<Node> unary_and_node = std::make_shared<Node>();
-    unary_and_node->accepted = true;
-    unary_and_node->type = Type::UNARY_AND;
-    unary_and_node->data = tok.value;
-    self->addChild((unary_and_node));
-  } else if (tok.type == TokenType::STAR) {
-    std::shared_ptr<Node> pointer_op_node = std::make_shared<Node>();
-    pointer_op_node->accepted = true;
-    pointer_op_node->type = Type::REFERENCE;
-    pointer_op_node->data = tok.value;
-    self->addChild((pointer_op_node));
-  } else if (tok.type == TokenType::PLUS) {
-    std::shared_ptr<Node> unary_positive_node = std::make_shared<Node>();
-    unary_positive_node->accepted = true;
-    unary_positive_node->type = Type::UNARY_POSITIVE;
-    unary_positive_node->data = tok.value;
-    self->addChild((unary_positive_node));
-  } else if (tok.type == TokenType::MINUS) {
-    std::shared_ptr<Node> unary_negative_node = std::make_shared<Node>();
-    unary_negative_node->accepted = true;
-    unary_negative_node->type = Type::UNARY_NEGATIVE;
-    unary_negative_node->data = tok.value;
-    self->addChild((unary_negative_node));
-  } else if (tok.type == TokenType::TILDE) {
-    std::shared_ptr<Node> bitwise_not_node = std::make_shared<Node>();
-    bitwise_not_node->accepted = true;
-    bitwise_not_node->type = Type::BITWISE_NOT;
-    bitwise_not_node->data = tok.value;
-    self->addChild((bitwise_not_node));
-  } else if (tok.type == TokenType::NOT) {
-    std::shared_ptr<Node> unary_not_node = std::make_shared<Node>();
-    unary_not_node->accepted = true;
-    unary_not_node->type = Type::UNARY_NOT;
-    unary_not_node->data = tok.value;
-    self->addChild((unary_not_node));
-  } else {
-    std::shared_ptr<Node> error_node = std::make_shared<Node>();
-    error_node->type = Type::ERROR;
-    error_node->data = tok.value;
-    error_node->accepted = false;
-    self->addChild((error_node));
+  if (tokens_rejected) {
+    HandleUnexpectedTerminal(self);
   }
 
   return self;
