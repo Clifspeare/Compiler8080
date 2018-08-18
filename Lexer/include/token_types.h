@@ -103,6 +103,7 @@ enum class TokenType {
   SIGNED,
   UNSIGNED,
   GOTO,
+  SIZEOF,
 
   UNKNOWN
 };

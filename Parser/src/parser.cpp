@@ -484,9 +484,102 @@ std::shared_ptr<Node> Parser::multiplicative_expression()
   return self;
 }
 
-std::shared_ptr<Node> Parser::cast_expression() {}
-std::shared_ptr<Node> Parser::unary_expression() {}
-std::shared_ptr<Node> Parser::postfix_expression() {}
+std::shared_ptr<Node> Parser::cast_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::CAST_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::unary_expression, self, true);
+
+  if(HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self)) {
+    callNonterminalProcedure(&Parser::type_name, self);
+    if(HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true)) {
+      return self;      
+    }
+    callNonterminalProcedure(&Parser::cast_expression, self);
+  }
+
+  return self;
+}
+
+std::shared_ptr<Node> Parser::unary_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::UNARY_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::postfix_expression, self, true);
+
+  if(HandleTerminal(TokenType::PLUS_PLUS, Type::INCREMENT, self)) {
+    if(callNonterminalProcedure(&Parser::unary_expression, self)) {
+      return self;
+    }
+  }
+
+  if(HandleTerminal(TokenType::MINUS_MINUS, Type::DECREMENT, self)) {
+    if(callNonterminalProcedure(&Parser::unary_expression, self)){
+      return self;
+    }
+  }
+
+  if(callNonterminalProcedure(&Parser::unary_operator, self, true)) {
+    if(callNonterminalProcedure(&Parser::cast_expression, self)){
+      return self;            
+    }    
+  }
+
+  if(HandleTerminal(TokenType::SIZEOF, Type::SIZEOF, self)) {
+    if(callNonterminalProcedure(&Parser::unary_expression, self)) {
+      return self;      
+    }
+  }
+
+  if(HandleTerminal(TokenType::SIZEOF, Type::SIZEOF, self)) {
+    if(callNonterminalProcedure(&Parser::type_name, self)) {
+      return self;
+    }
+  }            
+
+  return self;
+}
+std::shared_ptr<Node> Parser::postfix_expression() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::POSTFIX_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::primary_expression, self);
+  
+  bool expr_case = true;
+  bool assignment_expr_case = true;
+  bool dot_identifier_case = true;
+  bool ptr_identifier_case = true;
+  bool postfix_increment_case = true;
+  bool postfix_decrement_case = true;
+
+  while (expr_case || assignment_expr_case || dot_identifier_case || ptr_identifier_case || postfix_decrement_case || postfix_decrement_case) {
+    //
+    if ((expr_case = HandleTerminal(TokenType::OPEN_BRACKET, Type::OPEN_BRACKET, self))) {
+     callNonterminalProcedure(&Parser::expression, self);
+      if(!HandleTerminal(TokenType::CLOSE_BRACKET, Type::CLOSE_BRACKET, self, true)) {
+        return self;
+      }
+    }
+    if (assignment_expr_case = HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self)) {
+      while (callNonterminalProcedure(&Parser::assignment_expression, self, true));
+      if (!HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true)) {
+        return self;
+      }
+    }
+
+    if(dot_identifier_case = HandleTerminal(TokenType::DOT, Type::DOT, self)){
+      HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);      
+    }
+    if(ptr_identifier_case = HandleTerminal(TokenType::, Type::POINTER, self)){
+      HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);
+    }
+    postfix_increment_case = HandleTerminal(TokenType::PLUS_PLUS, Type::PLUS_PLUS, self);
+    postfix_decrement_case = HandleTerminal(TokenType::MINUS_MINUS, Type::MINUS_MINUS, self);
+  }
+}
 std::shared_ptr<Node> Parser::primary_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();

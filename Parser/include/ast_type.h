@@ -64,6 +64,9 @@ enum class Type {
   VOLATILE_KEYWORD,
   COLON,
   DIRECT_DECLARATOR,
+  INCREMENT,
+  DECREMENT,
+  SIZEOF,
 
   IF,
 
