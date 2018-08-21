@@ -570,15 +570,17 @@ std::shared_ptr<Node> Parser::postfix_expression()
       }
     }
 
-    if(dot_identifier_case = HandleTerminal(TokenType::DOT, Type::DOT, self)){
+    if(dot_identifier_case = HandleTerminal(TokenType::DOT, Type::ACCESS, self)){
       HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);      
     }
-    if(ptr_identifier_case = HandleTerminal(TokenType::, Type::POINTER, self)){
+    if(ptr_identifier_case = HandleTerminal(TokenType::SELECTION, Type::POINTER_MEMBER, self)){
       HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);
     }
-    postfix_increment_case = HandleTerminal(TokenType::PLUS_PLUS, Type::PLUS_PLUS, self);
-    postfix_decrement_case = HandleTerminal(TokenType::MINUS_MINUS, Type::MINUS_MINUS, self);
+    postfix_increment_case = HandleTerminal(TokenType::PLUS_PLUS, Type::INCREMENT, self);
+    postfix_decrement_case = HandleTerminal(TokenType::MINUS_MINUS, Type::DECREMENT, self);
   }
+
+  return self;
 }
 std::shared_ptr<Node> Parser::primary_expression() 
 {
