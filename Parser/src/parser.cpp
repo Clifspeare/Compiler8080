@@ -541,6 +541,7 @@ std::shared_ptr<Node> Parser::unary_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::postfix_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -582,6 +583,7 @@ std::shared_ptr<Node> Parser::postfix_expression()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::primary_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -600,7 +602,19 @@ std::shared_ptr<Node> Parser::primary_expression()
   return self;
 }
 
-std::shared_ptr<Node> Parser::constant() {}
+std::shared_ptr<Node> Parser::constant() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::CONSTANT;
+
+  // TODO: TokenType::CONSTANT should be TokenType::INTEGER_CONSTANT
+  HandleTerminal(TokenType::CONSTANT, Type::INTEGER_CONSTANT, self);
+  HandleTerminal(TokenType::CHARACTER_CONSTANT, Type::CHARACTER_CONSTANT, self);
+  HandleTerminal(TokenType::FLOATING_CONSTANT, Type::FLOATING_CONSTANT, self);
+
+  return self;
+
+}
 
 std::shared_ptr<Node> Parser::expression() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -631,7 +645,21 @@ std::shared_ptr<Node> Parser::assignment_expression() {
   return self;
 }
 
-std::shared_ptr<Node> Parser::conditional_expression() {}
+std::shared_ptr<Node> Parser::conditional_expression() 
+{
+std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::CONDITIONAL_EXPRESSION;
+
+  callNonterminalProcedure(&Parser::logical_or_expression, self);
+
+  if(HandleTerminal(TokenType::QUESTION_MARK, Type::QUESTION_MARK, self)){
+    callNonterminalProcedure(&Parser::expression, self);
+    HandleTerminal(TokenType::COLON, Type::COLON, self);
+    callNonterminalProcedure(&Parser::conditional_expression, self);
+  }
+
+  return self;
+}
 
 std::shared_ptr<Node> Parser::assignment_operator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -674,10 +702,47 @@ std::shared_ptr<Node> Parser::unary_operator() {
 
   return self;
 }
-std::shared_ptr<Node> Parser::type_name() {}
-std::shared_ptr<Node> Parser::parameter_type_list() {}
-std::shared_ptr<Node> Parser::parameter_list() {}
-std::shared_ptr<Node> Parser::parameter_declaration() {}
+
+std::shared_ptr<Node> Parser::type_name() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::TYPE_NAME;
+
+  if(callNonterminalProcedure(&Parser::specifier_qualifier, self)) {
+    while(callNonterminalProcedure(&Parser::specifier_qualifier, self, true));
+    callNonterminalProcedure(&Parser::abstract_declarator, self, true);
+  }
+
+  return self;
+
+}
+
+std::shared_ptr<Node> Parser::parameter_type_list() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::PARAMETER_TYPE_LIST;
+
+  if(callNonterminalProcedure(&Parser::parameter_list, self)) {
+    while(HandleTerminal(TokenType::COMMA, Type::COMMA, self)){
+      callNonterminalProcedure(&Parser::parameter_list, self);
+    }
+  }
+
+  return self;
+}
+
+std::shared_ptr<Node> Parser::parameter_list() // parameter_declaration , parameter_declaration ...
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::PARAMETER_LIST;
+
+  
+}
+
+std::shared_ptr<Node> Parser::parameter_declaration() 
+{
+
+}
 std::shared_ptr<Node> Parser::abstract_declarator() {}
 std::shared_ptr<Node> Parser::direct_abstract_declarator() {}
 std::shared_ptr<Node> Parser::enum_specifier() {}
@@ -685,6 +750,7 @@ std::shared_ptr<Node> Parser::enumerator_list() {}
 std::shared_ptr<Node> Parser::enumerator() {}
 std::shared_ptr<Node> Parser::typedef_name() {}
 std::shared_ptr<Node> Parser::declaration() {}
+
 std::shared_ptr<Node> Parser::init_declarator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
 
@@ -771,7 +837,9 @@ std::shared_ptr<Node> Parser::statement() {
 std::shared_ptr<Node> Parser::labeled_statement() {
   
 }
-std::shared_ptr<Node> Parser::expression_statement() {
+
+std::shared_ptr<Node> Parser::expression_statement() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::EXPRESSION_STATEMENT;
 
@@ -781,7 +849,9 @@ std::shared_ptr<Node> Parser::expression_statement() {
   return self;
 
 }
-std::shared_ptr<Node> Parser::selection_statement() {
+
+std::shared_ptr<Node> Parser::selection_statement() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::SELECTION_STATEMENT;
   int start_index = m_tokenIndex;
@@ -835,9 +905,11 @@ std::shared_ptr<Node> Parser::selection_statement() {
   }
 } 
 
-std::shared_ptr<Node> Parser::iteration_statement() {
+std::shared_ptr<Node> Parser::iteration_statement() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::ITERATION_STATEMENT;
+
   Token tok = getNextToken();
   int start_index = m_tokenIndex;
 
@@ -906,7 +978,8 @@ std::shared_ptr<Node> Parser::iteration_statement() {
 
 // TODO: test this.  I did it weird. (iterative instead of recursive to wrap my
 // head around left-refactoring)
-std::shared_ptr<Node> Parser::jump_statement() {
+std::shared_ptr<Node> Parser::jump_statement() 
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::JUMP_STATEMENT;
 

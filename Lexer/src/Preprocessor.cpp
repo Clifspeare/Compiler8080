@@ -5,6 +5,7 @@
 #include "../include/Preprocessor.h"
 #include <cassert>
 
+// Get token from scanner, handles special cases, and then 
 Token Preprocessor::getNextToken() {
   Token token = m_scanner.getNextToken();
 

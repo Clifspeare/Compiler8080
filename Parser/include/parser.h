@@ -4,9 +4,7 @@
 #include <functional>
 
 #include "Preprocessor.h"
-#include "ast_type.h"
 #include "node.h"
-#include "token_types.h"
 
 template <class T>
 class SymbolEntry {

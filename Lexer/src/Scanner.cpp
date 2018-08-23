@@ -2,6 +2,9 @@
 // Created by spencer on 2/23/18.
 //
 
+// TODO: Implement typedefs / macros.
+// TODO: Implement enum representation.
+
 #include "../include/Scanner.h"
 
 bool Scanner::checkSetReservedWord(Token& token) {
@@ -81,10 +84,21 @@ Token Scanner::getNextToken() {
     while (isdigit((c = getNextChar())) || (c == '.' && !decimalSeen)) {
       // TODO implement numeric constant logic
       if (c == '.') {
+        token.type = TokenType::FLOATING_CONSTANT;
         decimalSeen = true;
       }
       token.value += c;
     }
+  }
+
+  // CHAR/CONSTANT TOKEN TYPE
+  else if (c == '\'') {
+    token.type = TokenType::CHARACTER_CONSTANT;
+    c = getNextChar();
+    if (isalpha(c)) {
+      token.value = c;
+    }
+    getNextChar();
   }
 
   // STRING TOKEN TYPE

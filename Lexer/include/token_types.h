@@ -10,6 +10,9 @@
 enum class TokenType {
   ID,
   CONSTANT,
+  FLOATING_CONSTANT,
+  CHARACTER_CONSTANT,
+  ENUMERATION_CONSTANT,
   LITERAL,
   COMMENT,
   // preprocessors
