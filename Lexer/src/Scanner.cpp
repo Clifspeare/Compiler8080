@@ -99,6 +99,7 @@ Token Scanner::getNextToken() {
       token.value = c;
     }
     getNextChar();
+    extraCharNeedsPutback = false;
   }
 
   // STRING TOKEN TYPE
