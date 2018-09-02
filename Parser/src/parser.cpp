@@ -645,18 +645,20 @@ std::shared_ptr<Node> Parser::assignment_expression() {
   return self;
 }
 
+//TODO add ternary conditional - requires adding '?' special character to Lexical Scanner.
 std::shared_ptr<Node> Parser::conditional_expression() 
 {
-std::shared_ptr<Node> self = std::make_shared<Node>();
+  std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::CONDITIONAL_EXPRESSION;
 
   callNonterminalProcedure(&Parser::logical_or_expression, self);
 
-  if(HandleTerminal(TokenType::QUESTION_MARK, Type::QUESTION_MARK, self)){
+  /*if(HandleTerminal(TokenType::QUESTION_MARK, Type::QUESTION_MARK, self)){
     callNonterminalProcedure(&Parser::expression, self);
     HandleTerminal(TokenType::COLON, Type::COLON, self);
     callNonterminalProcedure(&Parser::conditional_expression, self);
-  }
+    }
+  }*/
 
   return self;
 }
@@ -736,15 +738,47 @@ std::shared_ptr<Node> Parser::parameter_list() // parameter_declaration , parame
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::PARAMETER_LIST;
 
+  callNonterminalProcedure(&Parser::parameter_declaration, self);
+
+  while (HandleTerminal(TokenType::COMMA, Type::COMMA, self)) {
+    callNonterminalProcedure(&Parser::parameter_declaration, self);
+  }
   
+  return self;
 }
 
 std::shared_ptr<Node> Parser::parameter_declaration() 
 {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::PARAMETER_DECLARATION;
+
+  callNonterminalProcedure(&Parser::parameter_declaration, self);
+
+  if ( !(callNonterminalProcedure(&Parser::abstract_declarator, self, true)) ) {
+    callNonterminalProcedure(&Parser::declarator, self, true);
+  }
+
+  return self;
+}
+std::shared_ptr<Node> Parser::abstract_declarator() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::ABSTRACT_DECLARATOR;
+
+  if (! (callNonterminalProcedure(&Parser::pointer, self, true))) {
+    callNonterminalProcedure(&Parser::direct_abstract_declarator, self, true);
+
+    // do a premature return to short-circuit unnecessary processing of alternate production-rule.
+    return self;
+  }
+
+  // for now, making this non-optional but in the future we should determine the "closer" of the two productions
+  callNonterminalProcedure(&Parser::direct_abstract_declarator, self);
+}
+std::shared_ptr<Node> Parser::direct_abstract_declarator() 
+{
 
 }
-std::shared_ptr<Node> Parser::abstract_declarator() {}
-std::shared_ptr<Node> Parser::direct_abstract_declarator() {}
 std::shared_ptr<Node> Parser::enum_specifier() {}
 std::shared_ptr<Node> Parser::enumerator_list() {}
 std::shared_ptr<Node> Parser::enumerator() {}
