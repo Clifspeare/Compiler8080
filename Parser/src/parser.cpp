@@ -777,16 +777,81 @@ std::shared_ptr<Node> Parser::abstract_declarator()
 }
 std::shared_ptr<Node> Parser::direct_abstract_declarator() 
 {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::DIRECT_ABSTRACT_DECLARATOR;
+
+  // any number of ( direct-declarator ) OR [ constant-expression ] OR ( parameter-type-list )
 
 }
-std::shared_ptr<Node> Parser::enum_specifier() {}
-std::shared_ptr<Node> Parser::enumerator_list() {}
-std::shared_ptr<Node> Parser::enumerator() {}
-std::shared_ptr<Node> Parser::typedef_name() {}
-std::shared_ptr<Node> Parser::declaration() {}
+std::shared_ptr<Node> Parser::enum_specifier() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::ENUM_SPECIFIER;
+
+  HandleTerminal(TokenType::ENUM, Type::ENUM, self, true);
+
+  if (callNonterminalProcedure(&Parser::enumerator_list, self, true)) {
+    return self;
+  }
+
+  if (HandleTerminal(TokenType::ID, Type::IDENTIFIER, self)) {
+    callNonterminalProcedure(&Parser::enumerator_list, self, true);
+  }
+
+  return self;
+}
+std::shared_ptr<Node> Parser::enumerator_list() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::ENUMERATOR_LIST;
+
+  callNonterminalProcedure(&Parser::enumerator, self);
+  while (HandleTerminal(TokenType::COMMA, Type::COMMA, self)) {
+    callNonterminalProcedure(&Parser::enumerator, self);
+  }
+
+  return self;
+}
+std::shared_ptr<Node> Parser::enumerator() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::ENUMERATOR;
+
+  HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);
+  while (HandleTerminal(TokenType::EQUAL, Type::ASSIGNMENT_OPERATOR, self)) {
+    HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);
+  }
+
+  return self;
+}
+std::shared_ptr<Node> Parser::typedef_name() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::TYPEDEF_NAME;
+
+  HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);
+
+  return self;
+}
+std::shared_ptr<Node> Parser::declaration()
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::DECLARATION;
+
+  while (callNonterminalProcedure(&Parser::declaration_specifier, self)) {
+    ; // keep running declaration_specifier
+  }
+
+  while (callNonterminalProcedure(&Parser::init_declarator, self, true)) {
+    ; // processed in conditional
+  }
+
+  return self;
+}
 
 std::shared_ptr<Node> Parser::init_declarator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::INIT_DECLARATOR;
 
   std::shared_ptr<Node> declarator_node = declarator();
   self->addChild(declarator_node);
@@ -806,8 +871,10 @@ std::shared_ptr<Node> Parser::init_declarator() {
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::initializer() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::INITIALIZER;
 
   std::shared_ptr<Node> assignment_expression_node = assignment_expression();
   if (assignment_expression_node->accepted) {
@@ -833,11 +900,19 @@ std::shared_ptr<Node> Parser::initializer() {
 
   return self;
 }
-std::shared_ptr<Node> Parser::initializer_list() {}
-std::shared_ptr<Node> Parser::compound_statement() 
+std::shared_ptr<Node> Parser::initializer_list() 
 {
-  
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::INITIALIZER_LIST;
+
+  callNonterminalProcedure(&Parser::initializer, self);
+  while (HandleTerminal(TokenType::COMMA, Type::COMMA, self)) {
+    callNonterminalProcedure(&Parser::initializer, self);
+  }
+
+  return self;
 }
+std::shared_ptr<Node> Parser::compound_statement() ;;
 
 std::shared_ptr<Node> Parser::statement() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -868,9 +943,7 @@ std::shared_ptr<Node> Parser::statement() {
   }
 }
 
-std::shared_ptr<Node> Parser::labeled_statement() {
-  
-}
+std::shared_ptr<Node> Parser::labeled_statement() ;;
 
 std::shared_ptr<Node> Parser::expression_statement() 
 {
