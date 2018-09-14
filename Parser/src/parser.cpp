@@ -775,14 +775,7 @@ std::shared_ptr<Node> Parser::abstract_declarator()
   // for now, making this non-optional but in the future we should determine the "closer" of the two productions
   callNonterminalProcedure(&Parser::direct_abstract_declarator, self);
 }
-std::shared_ptr<Node> Parser::direct_abstract_declarator() 
-{
-  std::shared_ptr<Node> self = std::make_shared<Node>();
-  self->type = Type::DIRECT_ABSTRACT_DECLARATOR;
-
-  // any number of ( direct-declarator ) OR [ constant-expression ] OR ( parameter-type-list )
-
-}
+std::shared_ptr<Node> Parser::direct_abstract_declarator() ;;
 std::shared_ptr<Node> Parser::enum_specifier() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
