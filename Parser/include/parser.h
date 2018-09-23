@@ -35,7 +35,7 @@ class Parser {
   int computeTreeSize(std::shared_ptr<Node> node);
   bool callNonterminalProcedure(std::shared_ptr<Node>(Parser::*fn)(), std::shared_ptr<Node> self, bool optional = false);
   bool HandleTerminal(TokenType token_type, Type node_type, std::shared_ptr<Node> self, bool mandatory = false);
-  bool HandleUnexpectedTerminal(std::shared_ptr<Node> self);
+  std::shared_ptr<Node> HandleUnexpectedTerminal(std::shared_ptr<Node> self);
 
   // TODO: add Type Registration for typedef
 

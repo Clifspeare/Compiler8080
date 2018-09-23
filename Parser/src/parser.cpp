@@ -30,6 +30,8 @@ struct ErrorInfo {
   std::string actual_value;
 };
 
+
+// To terminate, this function expects for 
 ErrorInfo getErrorInfo(std::shared_ptr<Node>& node) 
 {
   if (node->type == Type::ERROR) {
@@ -44,6 +46,8 @@ ErrorInfo getErrorInfo(std::shared_ptr<Node>& node)
       return getErrorInfo(n);
     }
   }
+
+  return ErrorInfo();
 }
 
 // PRINT DEBUG
@@ -338,6 +342,8 @@ std::shared_ptr<Node> Parser::direct_declarator()
       }      
     }
   }
+
+  return self;
 }
 
 std::shared_ptr<Node> Parser::constant_expression() 
@@ -774,6 +780,8 @@ std::shared_ptr<Node> Parser::abstract_declarator()
 
   // for now, making this non-optional but in the future we should determine the "closer" of the two productions
   callNonterminalProcedure(&Parser::direct_abstract_declarator, self);
+
+  return self;
 }
 std::shared_ptr<Node> Parser::direct_abstract_declarator() ;;
 std::shared_ptr<Node> Parser::enum_specifier() 
@@ -934,6 +942,9 @@ std::shared_ptr<Node> Parser::statement() {
   if (callNonterminalProcedure(&Parser::jump_statement, self)) {
     return self;
   }
+
+  // error?
+  return self;
 }
 
 std::shared_ptr<Node> Parser::labeled_statement() ;;
@@ -1003,6 +1014,8 @@ std::shared_ptr<Node> Parser::selection_statement()
       }
     }
   }
+
+  return self;
 } 
 
 std::shared_ptr<Node> Parser::iteration_statement() 
@@ -1073,6 +1086,8 @@ std::shared_ptr<Node> Parser::iteration_statement()
       }
     }
   }
+
+  return self;
 }
 
 
@@ -1194,10 +1209,11 @@ bool Parser::HandleTerminal(TokenType token_type, Type node_type, std::shared_pt
       m_tokenIndex = tokenIndex;
       return false;
     }
+    return false;
   }
 }
 
-bool Parser::HandleUnexpectedTerminal(std::shared_ptr<Node> self)
+std::shared_ptr<Node> Parser::HandleUnexpectedTerminal(std::shared_ptr<Node> self)
 {
   std::shared_ptr<Node> unexpected_terminal = std::make_shared<Node>();
   unexpected_terminal->type = Type::ERROR;
@@ -1206,4 +1222,6 @@ bool Parser::HandleUnexpectedTerminal(std::shared_ptr<Node> self)
 
   unexpected_terminal->accepted = false;
   self->addChild(unexpected_terminal);
+
+  return self;
 }
