@@ -57,7 +57,7 @@ void PrintErrorMessage(ErrorInfo info)
 }
 
 // FILE's ENTRY POINT
-std::shared_ptr<Node> Parser::translation_unit() 
+std::shared_ptr<Node> Parser::translation_unit()
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::TRANSLATION_UNIT;
@@ -173,9 +173,9 @@ std::shared_ptr<Node> Parser::struct_or_union_specifier()
   callNonterminalProcedure(&Parser::struct_or_union, self);
   HandleTerminal(TokenType::ID, Type::IDENTIFIER, self);
 
-  if (HandleTerminal(TokenType::OPEN_BRACKET, Type::OPEN_BRACKET, self)) {
+  if (HandleTerminal(TokenType::OPEN_BRACE, Type::OPEN_BRACE, self)) {
     while(callNonterminalProcedure(&Parser::struct_declaration, self));
-    HandleTerminal(TokenType::CLOSE_BRACKET, Type::CLOSE_BRACKET, self, true);
+    HandleTerminal(TokenType::CLOSE_BRACE, Type::CLOSE_BRACE, self, true);
   }
 
   return self;
@@ -651,7 +651,6 @@ std::shared_ptr<Node> Parser::assignment_expression() {
   return self;
 }
 
-//TODO add ternary conditional - requires adding '?' special character to Lexical Scanner.
 std::shared_ptr<Node> Parser::conditional_expression() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -659,12 +658,11 @@ std::shared_ptr<Node> Parser::conditional_expression()
 
   callNonterminalProcedure(&Parser::logical_or_expression, self);
 
-  /*if(HandleTerminal(TokenType::QUESTION_MARK, Type::QUESTION_MARK, self)){
+  if(HandleTerminal(TokenType::QUESTION_MARK, Type::QUESTION_MARK, self)){
     callNonterminalProcedure(&Parser::expression, self);
     HandleTerminal(TokenType::COLON, Type::COLON, self);
     callNonterminalProcedure(&Parser::conditional_expression, self);
     }
-  }*/
 
   return self;
 }
@@ -696,13 +694,12 @@ std::shared_ptr<Node> Parser::unary_operator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::UNARY_OPERATOR;
 
-  bool tokens_rejected = 
-  !(HandleTerminal(TokenType::AND, Type::UNARY_AND, self)
-  || HandleTerminal(TokenType::STAR, Type::REFERENCE, self)
-  || HandleTerminal(TokenType::PLUS, Type::UNARY_POSITIVE, self)
-  || HandleTerminal(TokenType::MINUS, Type::UNARY_NEGATIVE, self)
-  || HandleTerminal(TokenType::TILDE, Type::BITWISE_NOT, self)
-  || HandleTerminal(TokenType::NOT, Type::UNARY_NOT, self));
+  bool tokens_rejected = !(HandleTerminal(TokenType::AND, Type::UNARY_AND, self)
+                        || HandleTerminal(TokenType::STAR, Type::REFERENCE, self)
+                        || HandleTerminal(TokenType::PLUS, Type::UNARY_POSITIVE, self)
+                        || HandleTerminal(TokenType::MINUS, Type::UNARY_NEGATIVE, self)
+                        || HandleTerminal(TokenType::TILDE, Type::BITWISE_NOT, self)
+                        || HandleTerminal(TokenType::NOT, Type::UNARY_NOT, self));
 
   if (tokens_rejected) {
     HandleUnexpectedTerminal(self);
@@ -766,6 +763,7 @@ std::shared_ptr<Node> Parser::parameter_declaration()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::abstract_declarator() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -783,7 +781,35 @@ std::shared_ptr<Node> Parser::abstract_declarator()
 
   return self;
 }
-std::shared_ptr<Node> Parser::direct_abstract_declarator() ;;
+
+std::shared_ptr<Node> Parser::direct_abstract_declarator()
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::ABSTRACT_DECLARATOR;
+
+  HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self, true);
+  callNonterminalProcedure(&Parser::abstract_declarator, self);
+  HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true);
+
+  bool param_type_list_case = true, const_expr_case = true;
+
+  while (param_type_list_case || const_expr_case) {
+    param_type_list_case = false;
+    const_expr_case = false;
+    
+    if(HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self)){
+      callNonterminalProcedure(&Parser::constant_expression, self, true);
+      param_type_list_case = HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true);
+    }
+    else if(HandleTerminal(TokenType::OPEN_BRACKET, Type::OPEN_BRACKET, self)){
+      callNonterminalProcedure(&Parser::constant_expression, self, true);
+      const_expr_case = HandleTerminal(TokenType::CLOSE_BRACKET, Type::CLOSE_BRACKET, self, true);
+    }
+  }
+
+  return self;
+}
+
 std::shared_ptr<Node> Parser::enum_specifier() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -791,16 +817,16 @@ std::shared_ptr<Node> Parser::enum_specifier()
 
   HandleTerminal(TokenType::ENUM, Type::ENUM, self, true);
 
-  if (callNonterminalProcedure(&Parser::enumerator_list, self, true)) {
-    return self;
-  }
+  HandleTerminal(TokenType::ID, Type::IDENTIFIER, self);
 
-  if (HandleTerminal(TokenType::ID, Type::IDENTIFIER, self)) {
+  if (HandleTerminal(TokenType::OPEN_BRACE, Type::OPEN_BRACE, self)) {
     callNonterminalProcedure(&Parser::enumerator_list, self, true);
+    HandleTerminal(TokenType::CLOSE_BRACE, Type::CLOSE_BRACE, self);
   }
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::enumerator_list() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -813,6 +839,7 @@ std::shared_ptr<Node> Parser::enumerator_list()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::enumerator() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -825,6 +852,7 @@ std::shared_ptr<Node> Parser::enumerator()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::typedef_name() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -834,6 +862,7 @@ std::shared_ptr<Node> Parser::typedef_name()
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::declaration()
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -854,22 +883,12 @@ std::shared_ptr<Node> Parser::init_declarator() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::INIT_DECLARATOR;
 
-  std::shared_ptr<Node> declarator_node = declarator();
-  self->addChild(declarator_node);
-
-  int saved_token_index = m_tokenIndex;
-  Token nextToken = getNextToken();
-  if (declarator_node->accepted && nextToken.type == TokenType::EQUAL) {
-    std::shared_ptr<Node> assignment_op_node = std::make_shared<Node>();
-    self->addChild(assignment_op_node);
-    saved_token_index = m_tokenIndex;
-
-    std::shared_ptr<Node> initializer_node = initializer();
-    self->addChild(initializer_node);
-  } else {
-    m_tokenIndex = saved_token_index;
+  if(callNonterminalProcedure(&Parser::declarator, self)) {
+    if (HandleTerminal(TokenType::EQUAL, Type::ASSIGNMENT_OPERATOR, self)) {
+      callNonterminalProcedure(&Parser::initializer, self);      
+    }
   }
-
+  
   return self;
 }
 
@@ -877,30 +896,19 @@ std::shared_ptr<Node> Parser::initializer() {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::INITIALIZER;
 
-  std::shared_ptr<Node> assignment_expression_node = assignment_expression();
-  if (assignment_expression_node->accepted) {
-    self->addChild(assignment_expression_node);
-  } else {
-    std::shared_ptr<Node> initializer_list_node = initializer_list();
-    if (initializer_list_node->accepted) {
-      self->addChild(initializer_list_node);
-    } else {
-      // TODO: implement
-      // This function (won't have to be used much) calculates how far a node
-      // has been able to parse It traverses the depth and breadth of a tree,
-      // stopping in each direction when it finds a terminal mismatch.
-      // Technically i guess it could be a member method of Node...
-      if (computeTreeSize(assignment_expression_node) >
-          computeTreeSize(initializer_list_node)) {
-        self->addChild(assignment_expression_node);
-      } else {
-        self->addChild(initializer_list_node);
-      }
-    }
+  if (callNonterminalProcedure(&Parser::assignment_expression, self, true)) {
+    return self;
+  }
+
+  if(HandleTerminal(TokenType::OPEN_BRACE, Type::OPEN_BRACE, self)) {
+    callNonterminalProcedure(&Parser::initializer_list, self, true);
+    HandleTerminal(TokenType::COMMA, Type::COMMA, self);
+    HandleTerminal(TokenType::CLOSE_BRACE, Type::CLOSE_BRACE, self, true);
   }
 
   return self;
 }
+
 std::shared_ptr<Node> Parser::initializer_list() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
@@ -913,106 +921,98 @@ std::shared_ptr<Node> Parser::initializer_list()
 
   return self;
 }
-std::shared_ptr<Node> Parser::compound_statement() ;;
 
-std::shared_ptr<Node> Parser::statement() {
+std::shared_ptr<Node> Parser::compound_statement()
+{
   std::shared_ptr<Node> self = std::make_shared<Node>();
-  int saved_token_index = m_tokenIndex;
+  self->type = Type::COMPOUND_STATEMENT;
 
-  if (callNonterminalProcedure(&Parser::labeled_statement, self)) {
-    return self;
+  while (callNonterminalProcedure(&Parser::declaration, self, true)) {
+    ; // Work in condition
   }
 
-  if (callNonterminalProcedure(&Parser::expression_statement, self)) {
-    return self;
+  while (callNonterminalProcedure(&Parser::declaration, self, true)) {
+    ; // Work in condition
   }
 
-  if (callNonterminalProcedure(&Parser::compound_statement, self)) {
-    return self;
-  }
-
-  if (callNonterminalProcedure(&Parser::selection_statement, self)) {
-    return self;
-  }
-
-  if (callNonterminalProcedure(&Parser::iteration_statement, self)) {
-    return self;
-  }
-
-  if (callNonterminalProcedure(&Parser::jump_statement, self)) {
-    return self;
-  }
-
-  // error?
   return self;
 }
 
-std::shared_ptr<Node> Parser::labeled_statement() ;;
+std::shared_ptr<Node> Parser::statement() {
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::INITIALIZER_LIST;
+
+  callNonterminalProcedure(&Parser::labeled_statement, self, true);
+  callNonterminalProcedure(&Parser::expression_statement, self, true);
+  callNonterminalProcedure(&Parser::compound_statement, self, true);
+  callNonterminalProcedure(&Parser::selection_statement, self, true);
+  callNonterminalProcedure(&Parser::iteration_statement, self, true);
+  callNonterminalProcedure(&Parser::jump_statement, self, true);
+
+  // Add error info.
+  HandleUnexpectedTerminal(self);
+
+  return self;
+}
+
+std::shared_ptr<Node> Parser::labeled_statement() 
+{
+  std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::LABELED_STATEMENT;
+
+  if(HandleTerminal(TokenType::ID, Type::IDENTIFIER, self)){
+    HandleTerminal(TokenType::COLON, Type::COLON, self, true);
+    callNonterminalProcedure(&Parser::statement, self);
+    return self;    
+  }
+
+  if(HandleTerminal(TokenType::CASE, Type::CASE, self)) {
+    callNonterminalProcedure(&Parser::expression, self);
+    HandleTerminal(TokenType::COLON, Type::COLON, self, true);
+    callNonterminalProcedure(&Parser::statement, self);
+    return self;    
+  }  
+
+  if (HandleTerminal(TokenType::DEFAULT, Type::DEFAULT, self)) {
+    HandleTerminal(TokenType::COLON, Type::COLON, self, true);
+    callNonterminalProcedure(&Parser::statement, self);
+    return self;
+  }
+  
+  return HandleUnexpectedTerminal(self);
+}
 
 std::shared_ptr<Node> Parser::expression_statement() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::EXPRESSION_STATEMENT;
 
-  callNonterminalProcedure(&Parser::expression, self,
-                           m_tokenIndex);
+  callNonterminalProcedure(&Parser::expression, self, true);
+  HandleTerminal(TokenType::SEMICOLON,Type::SEMICOLON, self, true);
 
   return self;
-
 }
 
 std::shared_ptr<Node> Parser::selection_statement() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::SELECTION_STATEMENT;
-  int start_index = m_tokenIndex;
-  Token tok = getNextToken();
 
-  if (tok.type == TokenType::IF && getNextToken().type == TokenType::OPEN_PARENS)
-  {
-    if (callNonterminalProcedure(&Parser::expression, self,
-                                 m_tokenIndex))
-    {
-      if (getNextToken().type == TokenType::CLOSE_PARENS)
-      {
-        if (callNonterminalProcedure(&Parser::statement, self,
-                                     m_tokenIndex))
-        {
-          if (getNextToken().type == TokenType::ELSE)
-          {
-            if (callNonterminalProcedure(&Parser::statement, self,
-                                         m_tokenIndex))
-            {
-              return self;
-            }
-          }
-          else
-          {
-            return self;
-          }
-        }
-      }
+  if (HandleTerminal(TokenType::IF, Type::IF, self)) {
+    HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self, true);
+    callNonterminalProcedure(&Parser::expression, self);
+    HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true);
+    callNonterminalProcedure(&Parser::statement, self);
+
+    if (HandleTerminal(TokenType::ELSE, Type::ELSE, self)) {
+      callNonterminalProcedure(&Parser::statement, self);
     }
   }
-
-  m_tokenIndex = start_index;
-  if (tok.type == TokenType::SWITCH)
-  {
-    if (getNextToken().type == TokenType::OPEN_PARENS)
-    {
-      if (callNonterminalProcedure(&Parser::expression, self,
-                                   m_tokenIndex))
-      {
-        if (getNextToken().type == TokenType::CLOSE_PARENS)
-        {
-          if (callNonterminalProcedure(&Parser::statement, self,
-                                       m_tokenIndex))
-          {
-            return self;
-          }
-        }
-      }
-    }
+  if (HandleTerminal(TokenType::SWITCH, Type::SWITCH, self)) {
+    HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self, true);      
+    callNonterminalProcedure(&Parser::expression, self);
+    HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true);
+    callNonterminalProcedure(&Parser::statement, self);
   }
 
   return self;
@@ -1023,136 +1023,70 @@ std::shared_ptr<Node> Parser::iteration_statement()
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::ITERATION_STATEMENT;
 
-  Token tok = getNextToken();
-  int start_index = m_tokenIndex;
-
-  if (tok.type == TokenType::WHILE && getNextToken().type == TokenType::OPEN_PARENS)
-  {
-    if (callNonterminalProcedure(&Parser::expression, self,
-                                 m_tokenIndex))
-    {
-      if (getNextToken().type == TokenType::CLOSE_PARENS)
-      {
-        if (callNonterminalProcedure(&Parser::statement, self,
-                                     m_tokenIndex))
-        {
-          return self;
-        }
-      }
-    }
+  if(HandleTerminal(TokenType::WHILE, Type::WHILE, self)){
+    HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self, true);
+    callNonterminalProcedure(&Parser::expression, self);
+    HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true);
+    callNonterminalProcedure(&Parser::statement, self);
+    return self;           
+  }
+  
+  if(HandleTerminal(TokenType::DO, Type::DO, self)){
+    callNonterminalProcedure(&Parser::statement, self);
+    HandleTerminal(TokenType::WHILE, Type::WHILE, self, true);        
+    HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self, true);
+    callNonterminalProcedure(&Parser::expression, self);
+    HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true);
+    HandleTerminal(TokenType::SEMICOLON, Type::SEMICOLON, self, true);    
+    return self;
   }
 
-  m_tokenIndex = start_index;
-  if (tok.type == TokenType::DO)
-  {
-    if (callNonterminalProcedure(&Parser::statement, self,
-                                 m_tokenIndex))
-    {
-      if (tok.type == TokenType::WHILE && getNextToken().type == TokenType::OPEN_PARENS)
-      {
-        if (callNonterminalProcedure(&Parser::expression, self,
-                                     m_tokenIndex))
-        {
-          if (getNextToken().type == TokenType::CLOSE_PARENS)
-          {
-            if (callNonterminalProcedure(&Parser::statement, self,
-                                         m_tokenIndex))
-            {
-              return self;
-            }
-          }
-        }
-      }
+  if(HandleTerminal(TokenType::FOR, Type::FOR, self)){
+    HandleTerminal(TokenType::OPEN_PARENS, Type::LEFT_PARENTHESIS, self, true);
+
+    for(int i = 0; i < 2; ++i) {
+      callNonterminalProcedure(&Parser::expression, self, true);
+      HandleTerminal(TokenType::SEMICOLON, Type::SEMICOLON, self, true);
     }
+    callNonterminalProcedure(&Parser::expression, self, true);
+
+    HandleTerminal(TokenType::CLOSE_PARENS, Type::RIGHT_PARENTHESIS, self, true);
+    callNonterminalProcedure(&Parser::statement, self);
+    
+    return self;
   }
 
-  m_tokenIndex = start_index;
-  if (tok.type == TokenType::FOR && getNextToken().type == TokenType::OPEN_PARENS)
-  {
-    callNonterminalProcedure(&Parser::expression, self, m_tokenIndex);
-    if (getNextToken().type == TokenType::SEMICOLON)
-    {
-      callNonterminalProcedure(&Parser::expression, self, m_tokenIndex);
-      if (getNextToken().type == TokenType::SEMICOLON)
-      {
-        callNonterminalProcedure(&Parser::expression, self, m_tokenIndex);
-        if (getNextToken().type == TokenType::CLOSE_PARENS)
-        {
-          if (callNonterminalProcedure(&Parser::statement, self,m_tokenIndex))
-          {
-            return self;
-          }
-        }
-      }
-    }
-  }
-
-  return self;
+  return HandleUnexpectedTerminal(self);
 }
 
-
-// TODO: test this.  I did it weird. (iterative instead of recursive to wrap my
-// head around left-refactoring)
 std::shared_ptr<Node> Parser::jump_statement() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
   self->type = Type::JUMP_STATEMENT;
 
-  Token tok = getNextToken();
-
-  if (tok.type == TokenType::GOTO) {
-    std::shared_ptr<Node> goto_node = std::make_shared<Node>();
-    goto_node->accepted = true;
-    goto_node->type = Type::GOTO;
-    goto_node->data = tok.value;
-    self->addChild((goto_node));
-
-    tok = getNextToken();
-    if (tok.type == TokenType::ID) {
-      std::shared_ptr<Node> goto_label = std::make_shared<Node>();
-      goto_label->accepted = true;
-      goto_node->type = Type::GOTO;
-      goto_node->data = tok.value;
-
-      self->addChild((goto_label));
-    } else {
-      self->accepted = false;
-    }
-  } else if (tok.type == TokenType::CONTINUE) {
-    std::shared_ptr<Node> continue_node = std::make_shared<Node>();
-    continue_node->accepted = true;
-    continue_node->type = Type::CONTINUE;
-    continue_node->data = tok.value;
-    self->addChild((continue_node));
-  } else if (tok.type == TokenType::BREAK) {
-    std::shared_ptr<Node> break_node = std::make_shared<Node>();
-    break_node->accepted = true;
-    break_node->type = Type::BREAK;
-    break_node->data = tok.value;
-    self->addChild((break_node));
-  } else {
-    std::shared_ptr<Node> error_node = std::make_shared<Node>();
-    error_node->type = Type::ERROR;
-    error_node->data = tok.value;
-    error_node->accepted = false;
-    self->addChild((error_node));
-
+  if(HandleTerminal(TokenType::GOTO, Type::GOTO, self)){
+    HandleTerminal(TokenType::ID, Type::IDENTIFIER, self, true);
+    HandleTerminal(TokenType::SEMICOLON, Type::SEMICOLON, self, true);
     return self;
   }
 
-  // Next input should be semi-colon, for all possible productions
-  tok = getNextToken();
-  if (tok.type == TokenType::SEMICOLON) {
-    std::shared_ptr<Node> semicolon_node = std::make_shared<Node>();
-    semicolon_node->accepted = true;
-    semicolon_node->type = Type::STATEMENT_END;
-    semicolon_node->data = tok.value;
-    self->addChild((semicolon_node));
-  } else {
-    self->accepted = false;
+  if(HandleTerminal(TokenType::CONTINUE, Type::CONTINUE, self)){
+    HandleTerminal(TokenType::SEMICOLON, Type::SEMICOLON, self, true);
+    return self;
   }
 
-  return self;
+  if(HandleTerminal(TokenType::BREAK, Type::BREAK, self)){
+    HandleTerminal(TokenType::SEMICOLON, Type::SEMICOLON, self, true);
+    return self;
+  }
+
+  if(HandleTerminal(TokenType::RETURN, Type::RETURN, self)){
+    callNonterminalProcedure(&Parser::expression, self, true);
+    HandleTerminal(TokenType::SEMICOLON, Type::SEMICOLON, self, true);
+    return self;
+  }
+
+  return HandleUnexpectedTerminal(self);
 }
 
 bool Parser::callNonterminalProcedure(std::shared_ptr<Node> (Parser::*fn)(),

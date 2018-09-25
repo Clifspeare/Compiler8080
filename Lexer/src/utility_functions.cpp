@@ -303,6 +303,8 @@ TokenType tokenSymbolFromValue(const std::string& token_value) {
     return TokenType::ELLIPSIS;
   else if (token_value.substr(0, 2) == "/*" || token_value.substr(0, 2) == "//")
     return TokenType::COMMENT;
+  else if (token_value == "?")
+    return TokenType::QUESTION_MARK;
 
   return TokenType::UNKNOWN;
 };

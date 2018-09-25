@@ -70,7 +70,7 @@ enum class TokenType {
   SEMICOLON,
   COLON,
   ELLIPSIS,
-
+  QUESTION_MARK,
   // reserved words
   // native types
   INT,

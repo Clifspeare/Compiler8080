@@ -208,7 +208,8 @@ Token Scanner::getNextToken() {
           token.value += c;
         if (c == '=')  // bit NOT assign
           token.value += c;
-        // does ternary belong here?
+      case '?':
+        token.value += c; // Ternary operator
       case '^':
         if (c == '=')  // XOR assign
           token.value += c;
