@@ -19,6 +19,9 @@ bool Scanner::checkSetReservedWord(Token& token) {
 void Scanner::loadSourceFile(const char* filepath) {
   depth++;
   m_source_files.push(std::make_shared<std::ifstream>(filepath));
+  if (m_source_files.top()->fail()){
+    std::cout << "File path: " << filepath << " does not exist." << std::endl;
+  }
   m_current_file = m_source_files.top();
 }
 

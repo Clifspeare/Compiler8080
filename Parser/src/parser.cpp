@@ -3,17 +3,21 @@
 #include <iostream>
 #include <memory>
 
-Parser::Parser() : m_preprocessor(), m_root(), m_errors(), m_tokens() {
+Parser::Parser() : m_preprocessor("main.c"), m_root(), m_errors(), m_tokens() {
   m_root = std::make_shared<Node>();
   Token tok = m_preprocessor.getNextToken();
   while (tok.value != "end" && tok.value != "eof") {
     m_tokens.push_back(tok);
     tok = m_preprocessor.getNextToken();
   }
+
+  std::cout << "PAST TOKENS" << std::endl;
+
+  m_root = translation_unit();
 }
 
 bool Parser::HasTokens() {
-  if (m_tokenIndex == m_tokens.size()) {
+  if (m_tokenIndex >= m_tokens.size()) {
     return false;
   }
 
@@ -76,6 +80,7 @@ std::shared_ptr<Node> Parser::translation_unit()
 std::shared_ptr<Node> Parser::external_declaration() 
 {
   std::shared_ptr<Node> self = std::make_shared<Node>();
+  self->type = Type::EXTERNAL_DECLARATION;
   
   if(callNonterminalProcedure(&Parser::function_definition, self)) {
     return self;
@@ -151,6 +156,10 @@ std::shared_ptr<Node> Parser::type_specifier()
                           || HandleTerminal(TokenType::DOUBLE, Type::DOUBLE, self)
                           || HandleTerminal(TokenType::SIGNED, Type::SIGNED, self)
                           || HandleTerminal(TokenType::UNSIGNED, Type::UNSIGNED, self));
+  
+  if(!terminal_rejected) {
+    return self;
+  }
 
   callNonterminalProcedure(&Parser::struct_or_union_specifier, self, true);
   
@@ -1089,15 +1098,172 @@ std::shared_ptr<Node> Parser::jump_statement()
   return HandleUnexpectedTerminal(self);
 }
 
+std::string enum_strings[] = {
+    "ERROR",
+    "ITERATION_STATEMENT",
+    "SELECTION_STATEMENT",
+    "EXPRESSION_STATEMENT",
+    "TRANSLATION_UNIT",
+    "EXTERNAL_DECLARATION",
+    "FUNCTION_DEFINITION",
+    "DECLARATION",
+    "DECLARATION_SPECIFIER",
+    "STORAGE_CLASS_SPECIFIER",
+    "TYPE_SPECIFIER",
+    "TYPE_QUALIFER",
+    "DECLARATOR",
+    "PRIMARY_EXPRESSION",
+    "JUMP_STATEMENT",
+    "EXPRESSION",
+    "ASSIGNMENT_EXPRESSION",
+    "CONSTANT_EXPRESSION",
+    "CONDITIONAL_EXPRESSION",
+    "LOGICAL_OR_EXPRESSION",
+    "INCLUSIVE_OR_EXPRESSION",
+    "EXCLUSIVE_OR_EXPRESSION",
+    "LOGICAL_AND_EXPRESSION",
+    "BITWISE_AND_EXPRESSION",
+    "EQUALITY_EXPRESSION",
+    "RELATIONAL_EXPRESSION",
+    "SHIFT_EXPRESSION",
+    "ADDITIVE_EXPRESSION",
+    "MULTIPLICATIVE_EXPRESSION",
+    "CAST_EXPRESSION",
+    "UNARY_EXPRESSION",
+    "POSTFIX_EXPRESSION",
+    "ASSIGNMENT_OPERATOR",
+    "MULTIPLICATION_ASSIGNMENT",
+    "DIVISION_ASSIGNMENT",
+    "MODULUS_ASSIGNMENT",
+    "ADDITION_ASSIGNMENT",
+    "SUBTRACTION_ASSIGNMENT",
+    "LEFTSHIFT_ASSIGNMENT",
+    "RIGHTSHIFT_ASSIGNMENT",
+    "XOR_ASSIGNMENT",
+    "BITWISE_AND_ASSIGNMENT",
+    "BITWISE_OR_ASSIGNMENT",
+    "UNARY_OPERATOR",
+    "MULTIPLICATION_OPERATOR",
+    "DIVISION_OPERATOR",
+    "MODULUS_OPERATOR",
+    "BITWISE_NOT",
+    "GOTO",
+    "CONTINUE",
+    "BREAK",
+    "STATEMENT_END",
+    "STRUCT",
+    "STRUCT_DECLARATION",
+    "STRUCT_DECLARATOR",
+    "STRUCT_DECLARATOR_LIST",
+    "UNION",
+    "STRUCT_OR_UNION_SPECIFIER",
+    "STRUCT_OR_UNION",
+    "ENUM",
+    "ENUM_SPECIFIER",
+    "ENUMERATOR_LIST",
+    "ENUMERATOR",
+    "CONST_KEYWORD",
+    "VOLATILE_KEYWORD",
+    "SEMICOLON",
+    "COLON",
+    "DIRECT_DECLARATOR",
+    "DIRECT_ABSTRACT_DECLARATOR",
+    "INCREMENT",
+    "DECREMENT",
+    "SIZEOF",
+    "QUESTION_MARK",
+    "REFERENCE",
+    "AUTO",
+    "REGISTER",
+    "STATIC",
+    "EXTERN",
+    "TYPEDEF",
+    "TYPEDEF_NAME",
+    "VOID",
+    "CHAR",
+    "SHORT",
+    "LONG",
+    "INT",
+    "FLOAT",
+    "DOUBLE",
+    "SIGNED",
+    "UNSIGNED",
+    "DEFAULT",
+    "CASE",
+    "SWITCH",
+    "IF",
+    "ELSE",
+    "DO",
+    "WHILE",
+    "FOR",
+    "RETURN",
+    "IDENTIFIER",
+    "CONSTANT",
+    "INTEGER_CONSTANT",
+    "CHARACTER_CONSTANT",
+    "FLOATING_CONSTANT",
+    "STRING",
+    "POINTER",
+    "POINTER_MEMBER",
+    "PARAMETER_TYPE_LIST",
+    "PARAMETER_LIST",
+    "PARAMETER_DECLARATION",
+    "ABSTRACT_DECLARATOR",
+    "TYPE_NAME",
+    "INITIALIZER",
+    "INITIALIZER_LIST",
+    "INIT_DECLARATOR",
+    "COMMA",
+    "LOGICAL_OR_OPERATOR",
+    "LOGICAL_AND_OPERATOR",
+    "BITWISE_OR_OPERATOR",
+    "BITWISE_AND_OPERATOR",
+    "NOT_EQUAL_OPERATOR",
+    "EQUALITY_OPERATOR",
+    "XOR_OPERATOR",
+    "LESS_THAN_OPERATOR",
+    "GREATER_THAN_OPERATOR",
+    "LESS_THAN_EQUAL_OPERATOR",
+    "GREATER_THAN_EQUAL_OPERATOR",
+    "LEFTSHIFT_OPERATOR",
+    "RIGHTSHIFT_OPERATOR",
+    "ADDITION_OPERATOR",
+    "SUBTRACTION_OPERATOR",
+    "LEFT_PARENTHESIS",
+    "RIGHT_PARENTHESIS",
+    "OPEN_BRACKET",
+    "CLOSE_BRACKET",
+    "OPEN_BRACE",
+    "CLOSE_BRACE",
+    "UNARY_ASSIGNMENT",
+    "UNARY_AND",
+    "UNARY_POSITIVE",
+    "UNARY_NEGATIVE",
+    "UNARY_NOT",
+    "ACCESS",
+    "COMPOUND_STATEMENT",
+    "LABELED_STATEMENT"                                            
+};
+
+std::string StringifyEnum(Type enum_type)
+{
+  int index = static_cast<int>(enum_type);
+  return enum_strings[index];    
+}
+
 bool Parser::callNonterminalProcedure(std::shared_ptr<Node> (Parser::*fn)(),
                                       std::shared_ptr<Node> self,
-                                      bool optional) {
+                                      bool optional) {                                                                            
+    
   int tokenIndex = m_tokenIndex;
   std::shared_ptr<Node> node = (this->*fn)();
   if (optional == false) {
     self->addChild(node);
   }
   if (node->accepted) {
+    if(DEBUG){
+      std::cout << "Non-terminal node added. Data: " << StringifyEnum(self->type) << std::endl;
+    }    
     if (optional == true) {
       self->addChild(node);
     }
@@ -1130,13 +1296,14 @@ bool Parser::HandleTerminal(TokenType token_type, Type node_type, std::shared_pt
 
   if(tok.type == token_type) {
     self->type = node_type;
+    self->data = tok.value;
     self->accepted = true;
     self->addChild(terminal_node);
     return true;
   } else {
     if (mandatory) {
       self->type = Type::ERROR;
-      self->data = getNextToken().value;
+      self->data = tok.value;
       self->accepted = false;
       self->addChild(terminal_node);
     } else {

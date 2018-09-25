@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.9)
 
 project(Compiler8080)
 
+add_subdirectory(tinyxml2)
+
 include_directories(
     Lexer/include
     Parser/include
@@ -31,3 +33,6 @@ add_library(Parser ${PARSER_FILES})
 # SET TESTING ROUTINE EXECUTABLE
 add_executable(TestLexingRoutine tests/testlexingroutine.cpp)
 target_link_libraries(TestLexingRoutine Parser Lexer)
+
+add_executable(TestParsingTree tests/testparser.cpp)
+target_link_libraries(TestParsingTree tinyxml2 Parser Lexer)

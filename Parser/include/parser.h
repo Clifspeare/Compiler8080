@@ -6,6 +6,8 @@
 #include "Preprocessor.h"
 #include "node.h"
 
+#define DEBUG 1
+
 template <class T>
 class SymbolEntry {
  public:
@@ -19,6 +21,8 @@ class SymbolEntry {
 class Parser {
  public:
   Parser();
+
+  std::shared_ptr<Node> getTranslationUnit() {return m_root;};
 
   bool HasTokens();
 

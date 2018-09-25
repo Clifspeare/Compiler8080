@@ -14,7 +14,6 @@ struct Definition {
 
 class Preprocessor {
  public:
-  Preprocessor();
   Preprocessor(char* filepath);
   Preprocessor(Scanner existingScanner);
 

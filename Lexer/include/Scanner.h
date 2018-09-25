@@ -32,7 +32,7 @@ class Scanner {
   void unGetChar(char Character);
   int depth = 0;  // Count of how many files are open.
   bool end = false;
-  bool logRawTokens = true;
+  bool logRawTokens = false;
 
   std::vector<Token> m_tokens;
   std::vector<std::string> m_literals;
